@@ -31,7 +31,7 @@ export const ampcodeApi = {
 
   async getUpstreamApiKeys(): Promise<AmpcodeUpstreamApiKeyMapping[]> {
     const data = await apiClient.get<Record<string, unknown>>('/ampcode/upstream-api-keys');
-    const list = data?.['upstream-api-keys'] ?? data?.upstreamApiKeys ?? data?.items ?? data;
+    const list = data?.['upstream-api-keys'];
     return normalizeAmpcodeUpstreamApiKeys(list);
   },
 
@@ -48,7 +48,7 @@ export const ampcodeApi = {
 
   async getModelMappings(): Promise<AmpcodeModelMapping[]> {
     const data = await apiClient.get<Record<string, unknown>>('/ampcode/model-mappings');
-    const list = data?.['model-mappings'] ?? data?.modelMappings ?? data?.items ?? data;
+    const list = data?.['model-mappings'];
     return normalizeAmpcodeModelMappings(list);
   },
 

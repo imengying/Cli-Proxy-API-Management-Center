@@ -109,18 +109,14 @@ const readInitialAuthFilesPageState = (): AuthFilesPageInitialState => {
   const persistedCompactMode = readPersistedAuthFilesCompactMode();
   const persisted = readAuthFilesUiState();
 
-  const legacyPageSize =
-    typeof persisted?.pageSize === 'number' && Number.isFinite(persisted.pageSize)
-      ? clampCardPageSize(persisted.pageSize)
-      : null;
   const regularPageSize =
     typeof persisted?.regularPageSize === 'number' && Number.isFinite(persisted.regularPageSize)
       ? clampCardPageSize(persisted.regularPageSize)
-      : (legacyPageSize ?? DEFAULT_REGULAR_PAGE_SIZE);
+      : DEFAULT_REGULAR_PAGE_SIZE;
   const compactPageSize =
     typeof persisted?.compactPageSize === 'number' && Number.isFinite(persisted.compactPageSize)
       ? clampCardPageSize(persisted.compactPageSize)
-      : (legacyPageSize ?? DEFAULT_COMPACT_PAGE_SIZE);
+      : DEFAULT_COMPACT_PAGE_SIZE;
 
   const statusFilterMode = (() => {
     const persistedStatusFilterMode = normalizePersistedStatusFilterMode(

@@ -41,6 +41,7 @@ import {
   resolvePluginAssetURL,
   type PluginResourceEntry,
 } from '@/features/plugins/pluginResources';
+import { isPluginUiEnabled } from '@/features/plugins/pluginAvailability';
 import { triggerHeaderRefresh } from '@/hooks/useHeaderRefresh';
 import { LANGUAGE_LABEL_KEYS, LANGUAGE_ORDER } from '@/utils/constants';
 import { isSupportedLanguage } from '@/utils/language';
@@ -310,6 +311,7 @@ export function MainLayout() {
   const apiBase = useAuthStore((state) => state.apiBase);
   const supportsPlugin = useAuthStore((state) => state.supportsPlugin);
 
+  const config = useConfigStore((state) => state.config);
   const fetchConfig = useConfigStore((state) => state.fetchConfig);
   const clearCache = useConfigStore((state) => state.clearCache);
 
@@ -331,7 +333,8 @@ export function MainLayout() {
   const headerRef = useRef<HTMLElement | null>(null);
 
   const isLogsPage = location.pathname.startsWith('/logs');
-  const isPluginResourcePage = supportsPlugin && location.pathname.startsWith('/plugin-pages');
+  const pluginUiEnabled = isPluginUiEnabled(supportsPlugin, config);
+  const isPluginResourcePage = pluginUiEnabled && location.pathname.startsWith('/plugin-pages');
 
   // Keep floating header height available to sticky mobile elements and overlays.
   useLayoutEffect(() => {
@@ -435,7 +438,7 @@ export function MainLayout() {
   }, [fetchConfig]);
 
   const loadPluginResources = useCallback(async () => {
-    if (connectionStatus !== 'connected' || !supportsPlugin) {
+    if (connectionStatus !== 'connected' || !pluginUiEnabled) {
       setPluginResources([]);
       return;
     }
@@ -446,7 +449,7 @@ export function MainLayout() {
     } catch {
       setPluginResources([]);
     }
-  }, [connectionStatus, supportsPlugin]);
+  }, [connectionStatus, pluginUiEnabled]);
 
   useEffect(() => {
     const timer = window.setTimeout(() => {
@@ -577,7 +580,7 @@ export function MainLayout() {
           metaKey: 'nav_meta.config_management',
           icon: sidebarIcons.config,
         },
-        ...(supportsPlugin
+        ...(pluginUiEnabled
           ? [
               {
                 path: '/plugins',
@@ -601,7 +604,7 @@ export function MainLayout() {
         },
       ],
     },
-    ...(supportsPlugin && pluginPageNavItems.length > 0
+    ...(pluginUiEnabled && pluginPageNavItems.length > 0
       ? [
           {
             id: 'plugin-pages',

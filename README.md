@@ -1,4 +1,4 @@
-# CLI Proxy API 管理中心
+# CPA Manager
 
 用于管理与故障排查 **CLI Proxy API** 的单文件 Web UI（React + TypeScript），通过 **Management API** 完成配置、凭据与日志等管理操作。
 
@@ -9,7 +9,7 @@
 **示例地址**: https://remote.router-for.me/  
 **支持版本**: CLIProxyAPI 7.2.49
 
-从6.0.19版本开始，Web UI 随主程序一起提供；服务运行后，通过 API 端口上的"/management.html"访问它。
+服务运行后，通过 API 端口上的 `/management.html` 访问 Web UI。
 
 ## 这是什么（以及不是什么）
 
@@ -65,7 +65,7 @@ bun run build
 
 - `Authorization: Bearer <MANAGEMENT_KEY>`（默认）
 
-这与 Web UI 中"API Keys"页面管理的 `api-keys` 不同：后者是代理对外接口（如 OpenAI 兼容接口）给客户端使用的鉴权 key。
+这与 Web UI 配置面板中管理的 `api-keys` 不同：后者是代理对外接口（如 OpenAI 兼容接口）给客户端使用的鉴权 key。
 
 ### 远程管理
 
@@ -130,7 +130,7 @@ bun run build
 - **无法连接 / 401**：确认 API 地址与管理密钥；远程访问可能需要服务端开启远程管理。
 - **反复输错密钥**：服务端可能对远程 IP 进行临时封禁。
 - **日志页面不显示**：需要在“基础设置”里开启“写入日志文件”，导航项才会出现。
-- **功能提示不支持**：多为后端版本较旧或接口未启用/不存在（如：认证文件模型列表、排除模型、日志相关接口）。
+- **功能提示不支持**：确认对应接口已启用并可访问（如：认证文件模型列表、排除模型、日志相关接口）。
 - **OpenAI 提供商测试失败**：测试在浏览器侧执行，会受网络与 CORS 影响；这里失败不一定代表服务端不可用。
 
 ## 开发命令

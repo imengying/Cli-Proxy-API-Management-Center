@@ -126,9 +126,7 @@ const findRawRecord = (
   rawRecords: Array<Record<string, unknown> | undefined>,
   usedIndexes: Set<number>,
   payload: Record<string, unknown>,
-  index: number,
-  getIdentity: (record: Record<string, unknown>) => string,
-  fallbackByIndex = true
+  getIdentity: (record: Record<string, unknown>) => string
 ) => {
   const identity = getIdentity(payload);
   if (identity) {
@@ -142,14 +140,6 @@ const findRawRecord = (
     }
   }
 
-  if (fallbackByIndex) {
-    const fallback = rawRecords[index];
-    if (fallback && !usedIndexes.has(index)) {
-      usedIndexes.add(index);
-      return fallback;
-    }
-  }
-
   return undefined;
 };
 
@@ -157,23 +147,15 @@ const mergeKnownRecordList = (
   rawItems: unknown,
   payloadItems: Record<string, unknown>[],
   knownFields: readonly string[],
-  getIdentity: (record: Record<string, unknown>) => string,
-  fallbackByIndex = true
+  getIdentity: (record: Record<string, unknown>) => string
 ) => {
   const rawRecords = Array.isArray(rawItems)
     ? rawItems.map((item) => (isRecord(item) ? item : undefined))
     : [];
   const usedIndexes = new Set<number>();
 
-  return payloadItems.map((payload, index) => {
-    const raw = findRawRecord(
-      rawRecords,
-      usedIndexes,
-      payload,
-      index,
-      getIdentity,
-      fallbackByIndex
-    );
+  return payloadItems.map((payload) => {
+    const raw = findRawRecord(rawRecords, usedIndexes, payload, getIdentity);
     return mergeKnownFields(raw, payload, knownFields);
   });
 };
@@ -194,8 +176,7 @@ const mergeModelPayloads = (
         isRecord(raw) ? raw.models : undefined,
         models.filter(isRecord),
         knownFields,
-        modelIdentity,
-        false
+        modelIdentity
       )
     : undefined;
 
@@ -251,8 +232,8 @@ const buildPreservedList = async <T>(
     : [];
   const usedIndexes = new Set<number>();
 
-  return payloads.map((payload, index) => {
-    const raw = findRawRecord(rawRecords, usedIndexes, payload, index, getIdentity);
+  return payloads.map((payload) => {
+    const raw = findRawRecord(rawRecords, usedIndexes, payload, getIdentity);
     return mergePayload(raw, payload);
   });
 };

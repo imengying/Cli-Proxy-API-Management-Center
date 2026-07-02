@@ -57,10 +57,10 @@
     "unsaved_changes_message": "У вас есть несохранённые изменения. Если вы уйдёте, они будут потеряны. Выйти?"
   },
   "title": {
-    "login": "Центр управления CLI Proxy API"
+    "login": "CPA Manager"
   },
   "splash": {
-    "title": "CLI Proxy API",
+    "title": "CPA Manager",
     "subtitle": "Центр управления"
   },
   "auto_login": {
@@ -137,7 +137,7 @@
   },
   "dashboard": {
     "title": "Панель управления",
-    "subtitle": "Добро пожаловать в Центр управления CLI Proxy API",
+    "subtitle": "Добро пожаловать в CPA Manager",
     "openai_providers": "Поставщики OpenAI",
     "quick_actions": "Быстрые действия",
     "current_config": "Текущая конфигурация",
@@ -985,7 +985,7 @@
           "proxy_url": "URL прокси",
           "request_retry": "Количество повторов запросов",
           "max_retry_credentials": "Максимум учётных данных для повторов",
-          "max_retry_credentials_hint": "Оставьте пустым, чтобы не задавать поле. Значение 0 сохраняет legacy-поведение и позволяет перебрать все доступные учётные данные.",
+          "max_retry_credentials_hint": "Оставьте пустым, чтобы не задавать поле. Значение 0 позволяет перебрать все доступные учётные данные.",
           "max_retry_interval": "Максимальный интервал повтора (сек)",
           "auth_auto_refresh_workers": "Workers автообновления auth",
           "auth_auto_refresh_workers_hint": "Если больше 0, переопределяет число workers по умолчанию (16)",

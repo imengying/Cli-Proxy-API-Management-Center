@@ -265,7 +265,7 @@ const normalizeOauthExcludedModels = (payload: unknown): Record<string, string[]
   if (!payload || typeof payload !== 'object') return {};
 
   const record = payload as Record<string, unknown>;
-  const source = record['oauth-excluded-models'] ?? record.items ?? payload;
+  const source = record['oauth-excluded-models'];
   if (!source || typeof source !== 'object') return {};
 
   const result: Record<string, string[]> = {};
@@ -301,7 +301,7 @@ const normalizeOauthModelAlias = (payload: unknown): Record<string, OAuthModelAl
   if (!payload || typeof payload !== 'object') return {};
 
   const record = payload as Record<string, unknown>;
-  const source = record['oauth-model-alias'] ?? record.items ?? payload;
+  const source = record['oauth-model-alias'];
   if (!source || typeof source !== 'object') return {};
 
   const result: Record<string, OAuthModelAliasEntry[]> = {};

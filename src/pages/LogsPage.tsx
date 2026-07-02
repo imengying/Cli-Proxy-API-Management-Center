@@ -51,12 +51,7 @@ const MAX_BUFFER_LINES = 10000;
 const LONG_PRESS_MS = 650;
 const LONG_PRESS_MOVE_THRESHOLD = 10;
 
-type LogPosition = Pick<LogsQuery, 'after' | 'cursor'>;
-
-const getIncrementalAfter = (after: LogsQuery['after']): LogsQuery['after'] => {
-  if (typeof after !== 'number') return after;
-  return after > 1 ? after - 1 : undefined;
-};
+type LogPosition = Pick<LogsQuery, 'cursor'>;
 
 const buildLogsQuery = (incremental: boolean, position: LogPosition): LogsQuery => {
   const params: LogsQuery = { limit: MAX_BUFFER_LINES };
@@ -64,11 +59,6 @@ const buildLogsQuery = (incremental: boolean, position: LogPosition): LogsQuery 
 
   if (position.cursor) {
     params.cursor = position.cursor;
-  }
-
-  const after = getIncrementalAfter(position.after);
-  if (after !== undefined) {
-    params.after = after;
   }
 
   return params;
@@ -188,26 +178,17 @@ export function LogsPage() {
   const logRequestInFlightRef = useRef(false);
   const pendingFullReloadRef = useRef(false);
 
-  // 保存最新游标用于增量获取；CLIProxyAPI 7.2.49 优先使用 cursor，保留 after 作为同端点回退。
+  // 保存最新 cursor 用于增量获取。
   const logPositionRef = useRef<LogPosition>({});
 
   const resetLogPosition = () => {
     logPositionRef.current = {};
   };
 
-  const updateLogPosition = (
-    data: Awaited<ReturnType<typeof logsApi.fetchLogs>>,
-    incremental: boolean
-  ) => {
-    const currentPosition = logPositionRef.current;
+  const updateLogPosition = (data: Awaited<ReturnType<typeof logsApi.fetchLogs>>) => {
     const nextPosition: LogPosition = {};
     if (data.nextCursor) {
       nextPosition.cursor = data.nextCursor;
-    }
-    if (data.latestAfter !== undefined) {
-      nextPosition.after = data.latestAfter;
-    } else if (incremental && currentPosition.after !== undefined) {
-      nextPosition.after = currentPosition.after;
     }
     logPositionRef.current = nextPosition;
   };
@@ -258,7 +239,7 @@ export function LogsPage() {
       const data = await logsApi.fetchLogs(params);
       setFileLoggingRequired(false);
 
-      updateLogPosition(data, incremental);
+      updateLogPosition(data);
 
       const newLines = Array.isArray(data.lines) ? data.lines : [];
 

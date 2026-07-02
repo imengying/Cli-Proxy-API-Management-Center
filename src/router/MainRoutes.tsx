@@ -12,15 +12,16 @@ import { PluginStorePage } from '@/features/plugins/PluginStorePage';
 import { ConfigPage } from '@/pages/ConfigPage';
 import { LogsPage } from '@/pages/LogsPage';
 import { SystemPage } from '@/pages/SystemPage';
-import { useAuthStore } from '@/stores';
+import { isPluginUiEnabled } from '@/features/plugins/pluginAvailability';
+import { useAuthStore, useConfigStore } from '@/stores';
 
 export function MainRoutes({ location }: { location?: Location }) {
   const supportsPlugin = useAuthStore((state) => state.supportsPlugin);
+  const config = useConfigStore((state) => state.config);
+  const pluginUiEnabled = isPluginUiEnabled(supportsPlugin, config);
   const mainRoutes: RouteObject[] = [
     { path: '/', element: <DashboardPage /> },
     { path: '/dashboard', element: <DashboardPage /> },
-    { path: '/settings', element: <Navigate to="/config" replace /> },
-    { path: '/api-keys', element: <Navigate to="/config" replace /> },
     { path: '/ai-providers', element: <ProvidersWorkbenchPage /> },
     { path: '/ai-providers/*', element: <Navigate to="/ai-providers" replace /> },
     { path: '/auth-files', element: <AuthFilesPage /> },
@@ -28,7 +29,7 @@ export function MainRoutes({ location }: { location?: Location }) {
     { path: '/auth-files/oauth-model-alias', element: <AuthFilesOAuthModelAliasEditPage /> },
     { path: '/oauth', element: <OAuthPage /> },
     { path: '/quota', element: <QuotaPage /> },
-    ...(supportsPlugin
+    ...(pluginUiEnabled
       ? [
           { path: '/plugin-pages/:pluginId/:menuIndex', element: <PluginResourcePage /> },
           { path: '/plugins', element: <PluginsPage /> },

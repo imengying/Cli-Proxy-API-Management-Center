@@ -6,11 +6,9 @@ import { apiClient } from './client';
 import { LOGS_TIMEOUT_MS } from '@/utils/constants';
 import { isRecord } from '@/utils/helpers';
 
-export type LogCursor = number | string;
 export type LogBackendKind = 'unknown' | 'file';
 
 export interface LogsQuery {
-  after?: LogCursor;
   cursor?: string;
   limit?: number;
   offset?: number;
@@ -19,13 +17,11 @@ export interface LogsQuery {
 export interface CPALogsResponse {
   lines: string[];
   'line-count': number;
-  'latest-timestamp': number;
 }
 
 export interface LogsResponse {
   lines: string[];
   lineCount: number;
-  latestAfter?: LogCursor;
   nextCursor?: string;
   cursorReset?: boolean;
   logBackendKind: LogBackendKind;
@@ -49,27 +45,15 @@ const stringValue = (value: unknown): string => (typeof value === 'string' ? val
 const booleanValue = (value: unknown): boolean =>
   value === true || (typeof value === 'string' && value.trim().toLowerCase() === 'true');
 
-const unixSecondsFromValue = (value: unknown): number => {
-  if (typeof value === 'number' && Number.isFinite(value)) return value;
-  const text = stringValue(value);
-  if (!text) return 0;
-  const asNumber = Number(text);
-  if (Number.isFinite(asNumber)) return asNumber;
-  const asDate = Date.parse(text);
-  return Number.isFinite(asDate) ? Math.floor(asDate / 1000) : 0;
-};
-
 const normalizeCPALogs = (data: Record<string, unknown>): LogsResponse => {
   const lines = Array.isArray(data.lines)
     ? data.lines.filter((line): line is string => typeof line === 'string')
     : [];
-  const latestTimestamp = unixSecondsFromValue(data['latest-timestamp']);
   const lineCount = Number(data['line-count']);
 
   return {
     lines,
     lineCount: Number.isFinite(lineCount) ? lineCount : lines.length,
-    latestAfter: latestTimestamp > 0 ? latestTimestamp : undefined,
     nextCursor: stringValue(data['next-cursor']) || undefined,
     cursorReset: booleanValue(data['cursor-reset']),
     logBackendKind: 'file',

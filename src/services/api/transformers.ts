@@ -264,7 +264,7 @@ const normalizeOpenAIProvider = (provider: unknown): OpenAIProviderConfig | null
 
 const normalizeOauthExcluded = (payload: unknown): Record<string, string[]> | undefined => {
   if (!isRecord(payload)) return undefined;
-  const source = payload['oauth-excluded-models'] ?? payload.items ?? payload;
+  const source = payload['oauth-excluded-models'];
   if (!isRecord(source)) return undefined;
   const map: Record<string, string[]> = {};
   Object.entries(source).forEach(([provider, models]) => {

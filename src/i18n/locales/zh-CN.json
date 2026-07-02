@@ -57,10 +57,10 @@
     "unsaved_changes_message": "你有未保存的更改，离开后将丢失这些更改。确定要离开吗？"
   },
   "title": {
-    "login": "CLI Proxy API Management Center"
+    "login": "CPA Manager"
   },
   "splash": {
-    "title": "CLI Proxy API",
+    "title": "CPA Manager",
     "subtitle": "管理中心"
   },
   "auto_login": {
@@ -138,7 +138,7 @@
   },
   "dashboard": {
     "title": "仪表盘",
-    "subtitle": "欢迎使用 CLI Proxy API 管理中心",
+    "subtitle": "欢迎使用 CPA Manager",
     "openai_providers": "OpenAI 提供商",
     "quick_actions": "快捷操作",
     "current_config": "当前配置",
@@ -997,7 +997,7 @@
           "proxy_url": "代理 URL",
           "request_retry": "请求重试次数",
           "max_retry_credentials": "最大重试凭据数",
-          "max_retry_credentials_hint": "留空表示不设置；设为 0 表示保留 legacy 行为，并尝试所有可用凭据。",
+          "max_retry_credentials_hint": "留空表示不设置；设为 0 表示尝试所有可用凭据。",
           "max_retry_interval": "最大重试间隔 (秒)",
           "auth_auto_refresh_workers": "认证自动刷新 Worker 数",
           "auth_auto_refresh_workers_hint": "大于 0 时覆盖默认 Worker 数（16）",

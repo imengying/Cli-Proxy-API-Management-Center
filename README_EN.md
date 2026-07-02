@@ -1,4 +1,4 @@
-# CLI Proxy API Management Center
+# CPA Manager
 
 A single-file Web UI (React + TypeScript) for operating and troubleshooting the **CLI Proxy API** via its **Management API** (config, credentials, and logs).
 
@@ -9,7 +9,7 @@ A single-file Web UI (React + TypeScript) for operating and troubleshooting the 
 **Example URL**: https://remote.router-for.me/  
 **Supported Version**: CLIProxyAPI 7.2.49
 
-Since version 6.0.19, the Web UI ships with the main program; access it via `/management.html` on the API port once the service is running.
+After the service starts, access the Web UI via `/management.html` on the API port.
 
 ## What this is (and isn’t)
 
@@ -65,7 +65,7 @@ The management key is sent with every request as:
 
 - `Authorization: Bearer <MANAGEMENT_KEY>` (default)
 
-This is different from the proxy `api-keys` you manage inside the UI (those are for client requests to the proxy endpoints).
+This is different from the proxy `api-keys` managed in the Config Panel (those are for client requests to the proxy endpoints).
 
 ### Remote management
 
@@ -130,7 +130,7 @@ The UI language is automatically detected from browser settings and can be manua
 - **Can’t connect / 401**: confirm the API address and management key; remote access may require enabling remote management in the server config.
 - **Repeated auth failures**: the server may temporarily block remote IPs.
 - **Logs page missing**: enable “Logging to file” in Basic Settings; the navigation item is shown only when file logging is enabled.
-- **Some features show “unsupported”**: the backend may be too old or the endpoint is disabled/absent (common for model lists per auth file, excluded models, logs).
+- **Some features show “unsupported”**: confirm the corresponding endpoint is enabled and reachable (common for model lists per auth file, excluded models, logs).
 - **OpenAI provider test fails**: the test runs in the browser and depends on network/CORS of the provider endpoint; a failure here does not always mean the server cannot reach it.
 
 ## Development

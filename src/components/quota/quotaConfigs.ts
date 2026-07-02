@@ -382,10 +382,8 @@ const buildCodexQuotaWindows = (payload: CodexUsagePayload, t: TFunction): Codex
   const rawAllowed = rateLimit?.allowed;
 
   const pickClassifiedWindows = (
-    limitInfo?: CodexRateLimitInfo | null,
-    options?: { allowOrderFallback?: boolean }
+    limitInfo?: CodexRateLimitInfo | null
   ): { fiveHourWindow: CodexUsageWindow | null; weeklyWindow: CodexUsageWindow | null } => {
-    const allowOrderFallback = options?.allowOrderFallback ?? true;
     const primaryWindow = limitInfo?.primary_window ?? limitInfo?.primaryWindow ?? null;
     const secondaryWindow = limitInfo?.secondary_window ?? limitInfo?.secondaryWindow ?? null;
     const rawWindows = [primaryWindow, secondaryWindow];
@@ -400,17 +398,6 @@ const buildCodexQuotaWindows = (payload: CodexUsagePayload, t: TFunction): Codex
         fiveHourWindow = window;
       } else if ((seconds === WEEK_SECONDS || isMonthlyWindow(window)) && !weeklyWindow) {
         weeklyWindow = window;
-      }
-    }
-
-    // For legacy payloads without window duration, fallback to primary/secondary ordering.
-    if (allowOrderFallback) {
-      if (!fiveHourWindow) {
-        fiveHourWindow = primaryWindow && primaryWindow !== weeklyWindow ? primaryWindow : null;
-      }
-      if (!weeklyWindow) {
-        weeklyWindow =
-          secondaryWindow && secondaryWindow !== fiveHourWindow ? secondaryWindow : null;
       }
     }
 

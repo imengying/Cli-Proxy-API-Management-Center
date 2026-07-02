@@ -57,10 +57,10 @@
     "unsaved_changes_message": "You have unsaved changes. Leaving now will discard them. Do you want to leave?"
   },
   "title": {
-    "login": "CLI Proxy API Management Center"
+    "login": "CPA Manager"
   },
   "splash": {
-    "title": "CLI Proxy API",
+    "title": "CPA Manager",
     "subtitle": "Management Center"
   },
   "auto_login": {
@@ -138,7 +138,7 @@
   },
   "dashboard": {
     "title": "Dashboard",
-    "subtitle": "Welcome to CLI Proxy API Management Center",
+    "subtitle": "Welcome to CPA Manager",
     "openai_providers": "OpenAI Providers",
     "quick_actions": "Quick Actions",
     "current_config": "Current Configuration",
@@ -997,7 +997,7 @@
           "proxy_url": "Proxy URL",
           "request_retry": "Request Retry Count",
           "max_retry_credentials": "Max Retry Credentials",
-          "max_retry_credentials_hint": "Leave empty to keep it unset. Set to 0 to preserve legacy behavior and try all available credentials.",
+          "max_retry_credentials_hint": "Leave empty to keep it unset. Set to 0 to try all available credentials.",
           "max_retry_interval": "Max Retry Interval (seconds)",
           "auth_auto_refresh_workers": "Auth Auto-refresh Workers",
           "auth_auto_refresh_workers_hint": "When greater than 0, overrides the default worker count (16)",

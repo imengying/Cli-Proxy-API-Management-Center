@@ -53,20 +53,7 @@ function parseApiKeysText(raw: unknown): string {
 }
 
 function resolveApiKeysText(parsed: Record<string, unknown>): string {
-  if (Object.prototype.hasOwnProperty.call(parsed, 'api-keys')) {
-    return parseApiKeysText(parsed['api-keys']);
-  }
-
-  const auth = asRecord(parsed.auth);
-  const providers = asRecord(auth?.providers);
-  const configApiKeyProvider = asRecord(providers?.['config-api-key']);
-  if (!configApiKeyProvider) return '';
-
-  if (Object.prototype.hasOwnProperty.call(configApiKeyProvider, 'api-key-entries')) {
-    return parseApiKeysText(configApiKeyProvider['api-key-entries']);
-  }
-
-  return parseApiKeysText(configApiKeyProvider['api-keys']);
+  return parseApiKeysText(parsed['api-keys']);
 }
 
 type YamlDocument = ReturnType<typeof parseDocument>;
@@ -531,7 +518,7 @@ function parsePluginStoreAuthRules(raw: unknown): PluginStoreAuthRule[] {
       const rule: PluginStoreAuthRule = {
         id: `plugin-store-auth-${index}`,
         match,
-        applyTo: parsePluginStoreAuthApplyTo(record['apply-to'] ?? record.apply_to),
+        applyTo: parsePluginStoreAuthApplyTo(record['apply-to']),
         type: parsePluginStoreAuthType(record.type),
         tokenEnv: typeof record['token-env'] === 'string' ? record['token-env'] : '',
         usernameEnv: typeof record['username-env'] === 'string' ? record['username-env'] : '',
@@ -539,7 +526,7 @@ function parsePluginStoreAuthRules(raw: unknown): PluginStoreAuthRule[] {
         headerName: typeof record['header-name'] === 'string' ? record['header-name'] : '',
         headerValueEnv:
           typeof record['header-value-env'] === 'string' ? record['header-value-env'] : '',
-        allowInsecure: Boolean(record['allow-insecure'] ?? record.allow_insecure),
+        allowInsecure: Boolean(record['allow-insecure']),
       };
       return rule.match.trim() ||
         rule.type !== 'none' ||
@@ -554,18 +541,6 @@ function parsePluginStoreAuthRules(raw: unknown): PluginStoreAuthRule[] {
         : null;
     })
     .filter((rule): rule is PluginStoreAuthRule => Boolean(rule));
-}
-
-function deleteLegacyApiKeysProvider(doc: YamlDocument): void {
-  if (docHas(doc, ['auth', 'providers', 'config-api-key', 'api-key-entries'])) {
-    doc.deleteIn(['auth', 'providers', 'config-api-key', 'api-key-entries']);
-  }
-  if (docHas(doc, ['auth', 'providers', 'config-api-key', 'api-keys'])) {
-    doc.deleteIn(['auth', 'providers', 'config-api-key', 'api-keys']);
-  }
-  deleteIfMapEmpty(doc, ['auth', 'providers', 'config-api-key']);
-  deleteIfMapEmpty(doc, ['auth', 'providers']);
-  deleteIfMapEmpty(doc, ['auth']);
 }
 
 function parsePayloadModelEntries(raw: unknown, idPrefix: string): PayloadRule['models'] {
@@ -1088,9 +1063,7 @@ export function useVisualConfig() {
         rmPanelRepo:
           typeof remoteManagement?.['panel-github-repository'] === 'string'
             ? remoteManagement['panel-github-repository']
-            : typeof remoteManagement?.['panel-repo'] === 'string'
-              ? remoteManagement['panel-repo']
-              : '',
+            : '',
 
         authDir: typeof parsed['auth-dir'] === 'string' ? parsed['auth-dir'] : '',
         apiKeysText: resolveApiKeysText(parsed),
@@ -1245,9 +1218,6 @@ export function useVisualConfig() {
             values.rmDisableAutoUpdatePanel
           );
           setStringInDoc(doc, ['remote-management', 'panel-github-repository'], values.rmPanelRepo);
-          if (docHas(doc, ['remote-management', 'panel-repo'])) {
-            doc.deleteIn(['remote-management', 'panel-repo']);
-          }
           deleteIfMapEmpty(doc, ['remote-management']);
         }
 
@@ -1261,8 +1231,6 @@ export function useVisualConfig() {
         } else if (docHas(doc, ['api-keys'])) {
           doc.deleteIn(['api-keys']);
         }
-        deleteLegacyApiKeysProvider(doc);
-
         if (
           docHas(doc, ['plugins']) ||
           values.pluginsEnabled ||
