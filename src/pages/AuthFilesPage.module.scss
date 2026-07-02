@@ -246,12 +246,12 @@
 
 .filterControls {
   display: grid;
-  grid-template-columns: minmax(340px, 1fr) minmax(340px, 420px);
+  grid-template-columns: minmax(340px, 1fr) minmax(360px, 520px);
   grid-template-areas:
     'search options'
-    'status options';
-  gap: 12px;
-  align-items: stretch;
+    'status status';
+  gap: 14px;
+  align-items: start;
 
   // 修复 Input 组件在 filterItem 中的嵌套样式
   :global(.form-group) {
@@ -303,21 +303,32 @@
 
 .filterToggleItem {
   grid-area: status;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: 18px;
   min-width: 0;
   width: 100%;
+
+  @include mobile {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 10px;
+  }
 }
 
 .filterOptionsCard {
   grid-area: options;
   display: grid;
-  grid-template-columns: minmax(96px, 0.58fr) minmax(156px, 1fr);
+  grid-template-columns: minmax(112px, 160px) minmax(180px, 1fr);
   gap: 12px;
-  align-content: center;
+  align-items: end;
+  align-content: start;
   min-width: 0;
-  padding: 12px;
-  border-radius: 10px;
-  border: 1px solid color-mix(in srgb, var(--border-color) 60%, transparent);
-  background: color-mix(in srgb, var(--bg-primary) 56%, transparent);
+  align-self: start;
+  padding: 0;
+  border: 0;
+  background: transparent;
 
   @include mobile {
     grid-template-columns: 1fr;
@@ -339,23 +350,6 @@
   }
 }
 
-.filterOptionsToggle {
-  display: flex;
-  grid-column: 1 / -1;
-  align-items: center;
-  justify-content: center;
-  min-width: 0;
-  min-height: 42px;
-  padding-top: 2px;
-  border-top: 1px solid color-mix(in srgb, var(--border-color) 46%, transparent);
-
-  > label {
-    width: 100%;
-    min-width: 0;
-    justify-content: center;
-  }
-}
-
 .filterToggleLabel {
   display: inline-flex;
   align-items: center;
@@ -363,6 +357,28 @@
   font-size: 13px;
   font-weight: 600;
   line-height: 1.25;
+  white-space: nowrap;
+}
+
+.displayOptionsLabel {
+  flex: 0 0 auto;
+  color: var(--text-tertiary);
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0;
+  white-space: nowrap;
+}
+
+.displayOptionToggles {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 12px 28px;
+  min-width: 0;
+
+  :global(label) {
+    min-width: 0;
+  }
 }
 
 .searchInput {

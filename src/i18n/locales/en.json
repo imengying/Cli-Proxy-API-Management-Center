@@ -276,6 +276,7 @@
     "problem_filter_disabled": "Disabled",
     "problem_filter_only": "Only show problematic credentials",
     "disabled_filter_only": "Only show disabled credentials",
+    "enabled_filter_only": "Only show healthy credentials",
     "display_options_label": "Display options",
     "compact_mode_label": "Compact mode",
     "sort_label": "Sort",
@@ -1323,7 +1324,7 @@
   },
   "system_info": {
     "title": "System Info",
-    "about_title": "CLI Proxy API Management Center",
+    "about_title": "About",
     "last_update_label": "Last Update:",
     "cache_data": "Cache Data",
     "real_time_data": "Real-time Data",

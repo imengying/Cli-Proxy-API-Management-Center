@@ -276,6 +276,7 @@
     "problem_filter_disabled": "停用",
     "problem_filter_only": "仅显示有问题凭证",
     "disabled_filter_only": "仅显示已停用凭证",
+    "enabled_filter_only": "仅显示正常凭证",
     "display_options_label": "显示选项",
     "compact_mode_label": "简略模式",
     "sort_label": "排序",
@@ -1323,7 +1324,7 @@
   },
   "system_info": {
     "title": "系统信息",
-    "about_title": "CLI Proxy API Management Center",
+    "about_title": "关于",
     "last_update_label": "最后更新:",
     "cache_data": "缓存数据",
     "real_time_data": "实时数据",

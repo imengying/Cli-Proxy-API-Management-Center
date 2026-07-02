@@ -233,6 +233,13 @@ const headerIcons = {
       <path d="M19.07 4.93l-1.41 1.41" />
     </svg>
   ),
+  monitor: (
+    <svg {...headerIconProps}>
+      <rect x="3" y="4" width="18" height="12" rx="2" />
+      <path d="M8 20h8" />
+      <path d="M12 16v4" />
+    </svg>
+  ),
   logout: (
     <svg {...headerIconProps}>
       <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4" />
@@ -312,7 +319,6 @@ export function MainLayout() {
   const setLanguage = useLanguageStore((state) => state.setLanguage);
 
   const [sidebarOpen, setSidebarOpen] = useState(false);
-  const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
   const [languageMenuOpen, setLanguageMenuOpen] = useState(false);
   const [themeMenuOpen, setThemeMenuOpen] = useState(false);
   const [pluginResources, setPluginResources] = useState<PluginResourceEntry[]>([]);
@@ -324,11 +330,8 @@ export function MainLayout() {
   const themeMenuRef = useRef<HTMLDivElement | null>(null);
   const headerRef = useRef<HTMLElement | null>(null);
 
-  const fullBrandName = 'CLI Proxy API Management Center';
-  const abbrBrandName = t('title.abbr');
   const isLogsPage = location.pathname.startsWith('/logs');
   const isPluginResourcePage = supportsPlugin && location.pathname.startsWith('/plugin-pages');
-  const showSidebarLabels = !sidebarCollapsed || sidebarOpen;
 
   // Keep floating header height available to sticky mobile elements and overlays.
   useLayoutEffect(() => {
@@ -610,6 +613,21 @@ export function MainLayout() {
   ];
   const navItems = navGroups.flatMap((group) => flattenNavItems(group.items));
   const navOrder = navItems.map((item) => item.path);
+  const normalizedCurrentPath = (() => {
+    const trimmed =
+      location.pathname.length > 1 && location.pathname.endsWith('/')
+        ? location.pathname.slice(0, -1)
+        : location.pathname;
+    return trimmed === '/dashboard' ? '/' : trimmed;
+  })();
+  const currentNavItem =
+    navItems.find((item) => item.path === normalizedCurrentPath) ??
+    navItems.find(
+      (item) => item.path !== '/' && normalizedCurrentPath.startsWith(`${item.path}/`)
+    ) ??
+    navItems[0];
+  const currentPageTitle =
+    currentNavItem?.label ?? (currentNavItem?.labelKey ? t(currentNavItem.labelKey) : '');
   const getRouteOrder = (pathname: string) => {
     const trimmedPath =
       pathname.length > 1 && pathname.endsWith('/') ? pathname.slice(0, -1) : pathname;
@@ -691,15 +709,12 @@ export function MainLayout() {
         to={item.path}
         className={({ isActive }) => `${className} ${isActive ? 'active' : ''}`}
         onClick={() => setSidebarOpen(false)}
-        title={showSidebarLabels ? undefined : itemLabel}
       >
         <span className="nav-icon">{item.icon}</span>
-        {showSidebarLabels && (
-          <span className="nav-text">
-            <span className="nav-label">{itemLabel}</span>
-            {itemMeta ? <span className="nav-meta">{itemMeta}</span> : null}
-          </span>
-        )}
+        <span className="nav-text">
+          <span className="nav-label">{itemLabel}</span>
+          {itemMeta ? <span className="nav-meta">{itemMeta}</span> : null}
+        </span>
       </NavLink>
     );
   };
@@ -720,21 +735,16 @@ export function MainLayout() {
             isOpen ? 'open' : ''
           }`}
           onClick={() => togglePluginResourceDrawer(item.id)}
-          title={showSidebarLabels ? undefined : item.label}
           aria-expanded={isOpen}
         >
           <span className="nav-icon">{item.icon}</span>
-          {showSidebarLabels && (
-            <>
-              <span className="nav-text">
-                <span className="nav-label">{item.label}</span>
-                {item.meta ? <span className="nav-meta">{item.meta}</span> : null}
-              </span>
-              <span className="nav-drawer-caret" aria-hidden="true">
-                <IconChevronDown size={14} />
-              </span>
-            </>
-          )}
+          <span className="nav-text">
+            <span className="nav-label">{item.label}</span>
+            {item.meta ? <span className="nav-meta">{item.meta}</span> : null}
+          </span>
+          <span className="nav-drawer-caret" aria-hidden="true">
+            <IconChevronDown size={14} />
+          </span>
         </button>
         {isOpen ? (
           <div className="nav-sub-list">
@@ -750,35 +760,18 @@ export function MainLayout() {
     : t('sidebar.toggle_expand', { defaultValue: 'Open navigation' });
 
   return (
-    <div
-      className={`app-shell ${sidebarCollapsed ? 'sidebar-is-collapsed' : ''} ${
-        isPluginResourcePage ? 'plugin-resource-shell' : ''
-      }`}
-    >
+    <div className={`app-shell ${isPluginResourcePage ? 'plugin-resource-shell' : ''}`}>
       <div className="top-gradient-blur" aria-hidden="true" />
 
       <header className="main-header" ref={headerRef}>
-        <button
-          type="button"
-          className="sidebar-toggle-floating"
-          onClick={() => setSidebarCollapsed((prev) => !prev)}
-          title={
-            sidebarCollapsed
-              ? t('sidebar.expand', { defaultValue: '展开' })
-              : t('sidebar.collapse', { defaultValue: '收起' })
-          }
-          aria-label={
-            sidebarCollapsed
-              ? t('sidebar.expand', { defaultValue: '展开' })
-              : t('sidebar.collapse', { defaultValue: '收起' })
-          }
-        >
-          {sidebarCollapsed ? headerIcons.chevronRight : headerIcons.chevronLeft}
-        </button>
+        <div className="header-brand" title="CPAMC">
+          <img src={INLINE_LOGO_JPEG} alt="CPAMC logo" className="header-brand-logo" />
+          <span className="header-brand-title">CPAMC</span>
+        </div>
 
-        <div className="mobile-sidebar-actions">
+        <div className="header-main">
           <Button
-            className="mobile-menu-btn"
+            className="header-menu-btn"
             variant="ghost"
             size="sm"
             onClick={() => setSidebarOpen((prev) => !prev)}
@@ -787,9 +780,13 @@ export function MainLayout() {
           >
             {sidebarOpen ? headerIcons.close : headerIcons.menu}
           </Button>
+
+          <div className="header-current-page">
+            <span className="header-current-title">{currentPageTitle}</span>
+          </div>
         </div>
 
-        <div className="header-actions floating-actions">
+        <div className="header-actions">
           <Button
             variant="ghost"
             size="sm"
@@ -842,13 +839,7 @@ export function MainLayout() {
               aria-haspopup="menu"
               aria-expanded={themeMenuOpen}
             >
-              {theme === 'auto'
-                ? headerIcons.autoTheme
-                : theme === 'dark'
-                  ? headerIcons.moon
-                  : theme === 'white'
-                    ? headerIcons.whiteTheme
-                    : headerIcons.sun}
+              {headerIcons.monitor}
             </Button>
             {themeMenuOpen && (
               <div
@@ -921,25 +912,14 @@ export function MainLayout() {
           tabIndex={sidebarOpen ? 0 : -1}
         />
 
-        <aside
-          className={`sidebar ${sidebarOpen ? 'open' : ''} ${sidebarCollapsed ? 'collapsed' : ''}`}
-        >
-          <div className="sidebar-brand" title={fullBrandName}>
-            <img src={INLINE_LOGO_JPEG} alt="CPAMC logo" className="sidebar-brand-logo" />
-            {showSidebarLabels && <span className="sidebar-brand-title">{abbrBrandName}</span>}
-          </div>
-
+        <aside className={`sidebar ${sidebarOpen ? 'open' : ''}`}>
           <div className="nav-section">
-            {navGroups.map((group, idx) => (
+            {navGroups.map((group) => (
               <div
                 className={`nav-group ${group.id === 'plugin-pages' ? 'nav-group-bottom' : ''}`}
                 key={group.id}
               >
-                {showSidebarLabels ? (
-                  <div className="nav-group-label">{t(group.labelKey)}</div>
-                ) : (
-                  idx > 0 && <div className="nav-group-divider" aria-hidden="true" />
-                )}
+                <div className="nav-group-label">{t(group.labelKey)}</div>
                 {group.items.map((item) => renderNavItem(item))}
               </div>
             ))}

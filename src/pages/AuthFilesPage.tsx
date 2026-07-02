@@ -24,7 +24,6 @@ import { Select } from '@/components/ui/Select';
 import { IconFilterAll, IconSearch } from '@/components/ui/icons';
 import { EmptyState } from '@/components/ui/EmptyState';
 import { ToggleSwitch } from '@/components/ui/ToggleSwitch';
-import { AuthFilesStatusFilterCard } from '@/features/authFiles/components/AuthFilesStatusFilterCard';
 import { copyToClipboard } from '@/utils/clipboard';
 import {
   MAX_CARD_PAGE_SIZE,
@@ -387,23 +386,13 @@ export function AuthFilesPage() {
   const filesMatchingStatusFilters = useMemo(
     () =>
       files.filter((file) => {
-        if (enabledOnly && file.disabled === true) return false;
+        const hasProblem = hasAuthFileStatusMessage(file);
+        if (enabledOnly && (file.disabled === true || hasProblem)) return false;
         if (disabledOnly && file.disabled !== true) return false;
-        if (problemOnly && !hasAuthFileStatusMessage(file)) return false;
+        if (problemOnly && !hasProblem) return false;
         return true;
       }),
     [disabledOnly, enabledOnly, files, problemOnly]
-  );
-
-  const statusFilterOptions = useMemo(
-    () =>
-      [
-        { value: 'all', label: t('auth_files.problem_filter_all') },
-        { value: 'enabled', label: t('auth_files.problem_filter_enabled') },
-        { value: 'disabled', label: t('auth_files.problem_filter_disabled') },
-        { value: 'problem', label: t('auth_files.problem_filter_problem') },
-      ] satisfies Array<{ value: AuthFilesStatusFilterMode; label: string }>,
-    [t]
   );
 
   const sortOptions = useMemo(
@@ -782,7 +771,44 @@ export function AuthFilesPage() {
                       fullWidth
                     />
                   </div>
-                  <div className={styles.filterOptionsToggle}>
+                </div>
+                <div className={`${styles.filterItem} ${styles.filterToggleItem}`}>
+                  <span className={styles.displayOptionsLabel}>
+                    {t('auth_files.display_options_label')}
+                  </span>
+                  <div className={styles.displayOptionToggles}>
+                    <ToggleSwitch
+                      checked={problemOnly}
+                      onChange={(value) => handleStatusFilterModeChange(value ? 'problem' : 'all')}
+                      ariaLabel={t('auth_files.problem_filter_only')}
+                      label={
+                        <span className={styles.filterToggleLabel}>
+                          {t('auth_files.problem_filter_only')}
+                        </span>
+                      }
+                    />
+                    <ToggleSwitch
+                      checked={disabledOnly}
+                      onChange={(value) =>
+                        handleStatusFilterModeChange(value ? 'disabled' : 'all')
+                      }
+                      ariaLabel={t('auth_files.disabled_filter_only')}
+                      label={
+                        <span className={styles.filterToggleLabel}>
+                          {t('auth_files.disabled_filter_only')}
+                        </span>
+                      }
+                    />
+                    <ToggleSwitch
+                      checked={enabledOnly}
+                      onChange={(value) => handleStatusFilterModeChange(value ? 'enabled' : 'all')}
+                      ariaLabel={t('auth_files.enabled_filter_only')}
+                      label={
+                        <span className={styles.filterToggleLabel}>
+                          {t('auth_files.enabled_filter_only')}
+                        </span>
+                      }
+                    />
                     <ToggleSwitch
                       checked={compactMode}
                       onChange={(value) => setCompactMode(value)}
@@ -794,19 +820,6 @@ export function AuthFilesPage() {
                       }
                     />
                   </div>
-                </div>
-                <div className={`${styles.filterItem} ${styles.filterToggleItem}`}>
-                  <label>{t('auth_files.display_options_label')}</label>
-                  <AuthFilesStatusFilterCard
-                    label={t('auth_files.problem_filter_label')}
-                    minLabel={statusFilterOptions[0]?.label}
-                    maxLabel={statusFilterOptions[statusFilterOptions.length - 1]?.label}
-                    value={statusFilterMode}
-                    options={statusFilterOptions}
-                    onChange={(next) =>
-                      handleStatusFilterModeChange(next as AuthFilesStatusFilterMode)
-                    }
-                  />
                 </div>
               </div>
             </div>

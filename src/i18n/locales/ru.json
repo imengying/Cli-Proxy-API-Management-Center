@@ -275,6 +275,7 @@
     "problem_filter_disabled": "Откл.",
     "problem_filter_only": "Показывать только проблемные учётные данные",
     "disabled_filter_only": "Показывать только отключённые учётные данные",
+    "enabled_filter_only": "Показывать только исправные учётные данные",
     "display_options_label": "Параметры отображения",
     "compact_mode_label": "Компактный режим",
     "sort_label": "Сортировка",
@@ -1301,7 +1302,7 @@
   },
   "system_info": {
     "title": "Информация о центре управления",
-    "about_title": "CLI Proxy API Management Center",
+    "about_title": "О программе",
     "last_update_label": "Последнее обновление:",
     "cache_data": "Данные из кэша",
     "real_time_data": "Данные в реальном времени",
