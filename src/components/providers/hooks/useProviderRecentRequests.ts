@@ -111,11 +111,17 @@ export function useProviderRecentRequests(options: UseProviderRecentRequestsOpti
   );
 
   useEffect(() => {
-    if (!enabled) {
-      setUsageByProvider(EMPTY_USAGE_BY_PROVIDER);
-      return;
-    }
-    void loadRecentRequests().catch(() => {});
+    if (!enabled) return;
+
+    let cancelled = false;
+    queueMicrotask(() => {
+      if (cancelled) return;
+      void loadRecentRequests().catch(() => {});
+    });
+
+    return () => {
+      cancelled = true;
+    };
   }, [enabled, loadRecentRequests]);
 
   useInterval(

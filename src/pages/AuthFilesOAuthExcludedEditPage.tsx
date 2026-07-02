@@ -49,7 +49,14 @@ export function AuthFilesOAuthExcludedEditPage() {
   const [saving, setSaving] = useState(false);
 
   useEffect(() => {
-    setProvider(providerFromParams);
+    let cancelled = false;
+    queueMicrotask(() => {
+      if (cancelled) return;
+      setProvider(providerFromParams);
+    });
+    return () => {
+      cancelled = true;
+    };
   }, [providerFromParams]);
 
   const providerOptions = useMemo(() => {
@@ -159,52 +166,64 @@ export function AuthFilesOAuthExcludedEditPage() {
   }, []);
 
   useEffect(() => {
-    if (!resolvedProviderKey) {
-      setSelectedModels(new Set());
-      return;
-    }
-    const existing = excluded[resolvedProviderKey] ?? [];
-    setSelectedModels(new Set(existing));
+    let cancelled = false;
+    queueMicrotask(() => {
+      if (cancelled) return;
+      if (!resolvedProviderKey) {
+        setSelectedModels(new Set());
+        return;
+      }
+      const existing = excluded[resolvedProviderKey] ?? [];
+      setSelectedModels(new Set(existing));
+    });
+    return () => {
+      cancelled = true;
+    };
   }, [excluded, resolvedProviderKey]);
 
   useEffect(() => {
-    if (!resolvedProviderKey || excludedUnsupported) {
-      setModelsList([]);
-      setModelsError(null);
-      setModelsLoading(false);
-      return;
-    }
-
     let cancelled = false;
-    setModelsLoading(true);
-    setModelsError(null);
 
-    authFilesApi
-      .getModelDefinitions(resolvedProviderKey)
-      .then((models) => {
-        if (cancelled) return;
-        setModelsList(models);
-      })
-      .catch((err: unknown) => {
-        if (cancelled) return;
-        const status =
-          typeof err === 'object' && err !== null && 'status' in err
-            ? (err as { status?: unknown }).status
-            : undefined;
+    queueMicrotask(() => {
+      if (cancelled) return;
 
-        if (status === 400 || status === 404) {
-          setModelsList([]);
-          setModelsError('unsupported');
-          return;
-        }
-
-        const errorMessage = err instanceof Error ? err.message : '';
-        showNotification(`${t('notification.load_failed')}: ${errorMessage}`, 'error');
-      })
-      .finally(() => {
-        if (cancelled) return;
+      if (!resolvedProviderKey || excludedUnsupported) {
+        setModelsList([]);
+        setModelsError(null);
         setModelsLoading(false);
-      });
+        return;
+      }
+
+      setModelsLoading(true);
+      setModelsError(null);
+
+      authFilesApi
+        .getModelDefinitions(resolvedProviderKey)
+        .then((models) => {
+          if (cancelled) return;
+          setModelsList(models);
+        })
+        .catch((err: unknown) => {
+          if (cancelled) return;
+          const status =
+            typeof err === 'object' && err !== null && 'status' in err
+              ? (err as { status?: unknown }).status
+              : undefined;
+
+          if (status === 400 || status === 404) {
+            setModelsList([]);
+            setModelsError('unsupported');
+            return;
+          }
+
+          const errorMessage = err instanceof Error ? err.message : '';
+          showNotification(`${t('notification.load_failed')}: ${errorMessage}`, 'error');
+        })
+        .finally(() => {
+          if (cancelled) return;
+          setModelsLoading(false);
+        });
+    });
 
     return () => {
       cancelled = true;

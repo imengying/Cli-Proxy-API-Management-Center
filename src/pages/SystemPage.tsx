@@ -120,7 +120,7 @@ export function SystemPage() {
 
   const resolveApiKeysForModels = useApiKeysForModels();
 
-  const fetchModels = async ({ forceRefresh = false }: { forceRefresh?: boolean } = {}) => {
+  const fetchModels = useCallback(async ({ forceRefresh = false }: { forceRefresh?: boolean } = {}) => {
     if (auth.connectionStatus !== 'connected') {
       setModelStatus({
         type: 'warning',
@@ -152,7 +152,14 @@ export function SystemPage() {
       const text = `${t('system_info.models_error')}${suffix}`;
       setModelStatus({ type: 'error', message: text });
     }
-  };
+  }, [
+    auth.apiBase,
+    auth.connectionStatus,
+    fetchModelsFromStore,
+    resolveApiKeysForModels,
+    showNotification,
+    t,
+  ]);
 
   const handleClearLoginStorage = () => {
     showConfirmation({
@@ -270,7 +277,14 @@ export function SystemPage() {
 
   useEffect(() => {
     if (requestLogModalOpen && !requestLogTouched) {
-      setRequestLogDraft(requestLogEnabled);
+      let cancelled = false;
+      queueMicrotask(() => {
+        if (cancelled) return;
+        setRequestLogDraft(requestLogEnabled);
+      });
+      return () => {
+        cancelled = true;
+      };
     }
   }, [requestLogModalOpen, requestLogTouched, requestLogEnabled]);
 
@@ -283,9 +297,15 @@ export function SystemPage() {
   }, []);
 
   useEffect(() => {
-    fetchModels();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [auth.connectionStatus, auth.apiBase]);
+    let cancelled = false;
+    queueMicrotask(() => {
+      if (cancelled) return;
+      void fetchModels();
+    });
+    return () => {
+      cancelled = true;
+    };
+  }, [fetchModels]);
 
   return (
     <div className={styles.container}>

@@ -291,7 +291,14 @@ export function PluginsPage() {
   useHeaderRefresh(loadPlugins, connected);
 
   useEffect(() => {
-    void loadPlugins();
+    let cancelled = false;
+    queueMicrotask(() => {
+      if (cancelled) return;
+      void loadPlugins();
+    });
+    return () => {
+      cancelled = true;
+    };
   }, [loadPlugins]);
 
   const pluginStats = useMemo(() => {

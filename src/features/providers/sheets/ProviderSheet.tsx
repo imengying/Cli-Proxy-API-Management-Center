@@ -59,7 +59,14 @@ export function ProviderSheet({
   // (brand / resource / mode) changes — the child form will re-mount and
   // re-report its own dirty state.
   useEffect(() => {
-    setIsDirty(false);
+    let cancelled = false;
+    queueMicrotask(() => {
+      if (cancelled) return;
+      setIsDirty(false);
+    });
+    return () => {
+      cancelled = true;
+    };
   }, [state.brand, state.mode, state.resource?.id, state.open]);
 
   const handleDirtyChange = useCallback((dirty: boolean) => {

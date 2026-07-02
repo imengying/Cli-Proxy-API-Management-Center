@@ -176,7 +176,8 @@ export function LogsPage() {
   const [requestLogDownloading, setRequestLogDownloading] = useState(false);
   const [fullscreenLogs, setFullscreenLogs] = useState(false);
 
-  const logScrollerRef = useRef<ReturnType<typeof useLogScroller> | null>(null);
+  const logViewerRef = useRef<HTMLDivElement | null>(null);
+  const requestScrollToBottomRef = useRef<(() => void) | null>(null);
   const errorLogViewRequestRef = useRef(0);
   const longPressRef = useRef<{
     timer: number | null;
@@ -248,11 +249,9 @@ export function LogsPage() {
     setError('');
 
     try {
-      const scrollerInstance = logScrollerRef.current;
-      const stickToBottom =
-        !incremental || isNearBottom(scrollerInstance?.logViewerRef.current ?? null);
+      const stickToBottom = !incremental || isNearBottom(logViewerRef.current);
       if (stickToBottom) {
-        scrollerInstance?.requestScrollToBottom();
+        requestScrollToBottomRef.current?.();
       }
 
       const params = buildLogsQuery(incremental, logPositionRef.current);
@@ -439,9 +438,16 @@ export function LogsPage() {
 
   useEffect(() => {
     if (connectionStatus === 'connected') {
-      resetLogPosition();
-      setFileLoggingRequired(false);
-      loadLogs(false);
+      let cancelled = false;
+      queueMicrotask(() => {
+        if (cancelled) return;
+        resetLogPosition();
+        setFileLoggingRequired(false);
+        loadLogs(false);
+      });
+      return () => {
+        cancelled = true;
+      };
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [connectionStatus, loggingToFileEnabled]);
@@ -449,7 +455,14 @@ export function LogsPage() {
   useEffect(() => {
     if (activeTab !== 'errors') return;
     if (connectionStatus !== 'connected') return;
-    void loadErrorLogs();
+    let cancelled = false;
+    queueMicrotask(() => {
+      if (cancelled) return;
+      void loadErrorLogs();
+    });
+    return () => {
+      cancelled = true;
+    };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [activeTab, connectionStatus, requestLogEnabled]);
 
@@ -537,7 +550,8 @@ export function LogsPage() {
 
   const rawVisibleText = useMemo(() => filteredLines.join('\n'), [filteredLines]);
 
-  const scroller = useLogScroller({
+  const { canLoadMore, handleLogScroll, requestScrollToBottom } = useLogScroller({
+    logViewerRef,
     logState,
     setLogState,
     loading,
@@ -547,7 +561,14 @@ export function LogsPage() {
     showRawLogs,
   });
 
-  logScrollerRef.current = scroller;
+  useEffect(() => {
+    requestScrollToBottomRef.current = requestScrollToBottom;
+    return () => {
+      if (requestScrollToBottomRef.current === requestScrollToBottom) {
+        requestScrollToBottomRef.current = null;
+      }
+    };
+  }, [requestScrollToBottom]);
 
   const copyLogLine = async (raw: string) => {
     const ok = await copyToClipboard(raw);
@@ -942,13 +963,13 @@ export function LogsPage() {
               <div className="hint">{t('logs.loading')}</div>
             ) : logState.buffer.length > 0 && filteredLines.length > 0 ? (
               <div
-                ref={scroller.logViewerRef}
+                ref={logViewerRef}
                 className={[styles.logPanel, fullscreenLogs ? styles.logPanelFullscreen : '']
                   .filter(Boolean)
                   .join(' ')}
-                onScroll={scroller.handleLogScroll}
+                onScroll={handleLogScroll}
               >
-                {scroller.canLoadMore && (
+                {canLoadMore && (
                   <div className={styles.loadMoreBanner}>
                     <span>{t('logs.load_more_hint')}</span>
                     <div className={styles.loadMoreStats}>

@@ -231,7 +231,14 @@ export function PluginStorePage() {
   useHeaderRefresh(loadStore, connected);
 
   useEffect(() => {
-    void loadStore();
+    let cancelled = false;
+    queueMicrotask(() => {
+      if (cancelled) return;
+      void loadStore();
+    });
+    return () => {
+      cancelled = true;
+    };
   }, [loadStore]);
 
   const stats = useMemo(() => {

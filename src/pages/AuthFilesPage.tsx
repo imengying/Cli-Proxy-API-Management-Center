@@ -92,6 +92,76 @@ const normalizePersistedStatusFilterMode = (value: unknown): AuthFilesStatusFilt
   return isAuthFilesStatusFilterMode(value) ? value : null;
 };
 
+type AuthFilesPageInitialState = {
+  filter: 'all' | string;
+  statusFilterMode: AuthFilesStatusFilterMode;
+  compactMode: boolean;
+  search: string;
+  page: number;
+  pageSizeByMode: {
+    regular: number;
+    compact: number;
+  };
+  sortMode: AuthFilesSortMode;
+};
+
+const readInitialAuthFilesPageState = (): AuthFilesPageInitialState => {
+  const persistedCompactMode = readPersistedAuthFilesCompactMode();
+  const persisted = readAuthFilesUiState();
+
+  const legacyPageSize =
+    typeof persisted?.pageSize === 'number' && Number.isFinite(persisted.pageSize)
+      ? clampCardPageSize(persisted.pageSize)
+      : null;
+  const regularPageSize =
+    typeof persisted?.regularPageSize === 'number' && Number.isFinite(persisted.regularPageSize)
+      ? clampCardPageSize(persisted.regularPageSize)
+      : (legacyPageSize ?? DEFAULT_REGULAR_PAGE_SIZE);
+  const compactPageSize =
+    typeof persisted?.compactPageSize === 'number' && Number.isFinite(persisted.compactPageSize)
+      ? clampCardPageSize(persisted.compactPageSize)
+      : (legacyPageSize ?? DEFAULT_COMPACT_PAGE_SIZE);
+
+  const statusFilterMode = (() => {
+    const persistedStatusFilterMode = normalizePersistedStatusFilterMode(
+      persisted?.statusFilterMode
+    );
+    if (persistedStatusFilterMode) return persistedStatusFilterMode;
+    if (
+      typeof persisted?.problemOnly === 'boolean' ||
+      typeof persisted?.disabledOnly === 'boolean'
+    ) {
+      return resolveStatusFilterMode(
+        persisted.problemOnly === true,
+        persisted.disabledOnly === true
+      );
+    }
+    return 'all';
+  })();
+
+  return {
+    filter:
+      typeof persisted?.filter === 'string' && persisted.filter.trim()
+        ? normalizeProviderKey(persisted.filter)
+        : 'all',
+    statusFilterMode,
+    compactMode:
+      typeof persistedCompactMode === 'boolean'
+        ? persistedCompactMode
+        : persisted?.compactMode === true,
+    search: typeof persisted?.search === 'string' ? persisted.search : '',
+    page:
+      typeof persisted?.page === 'number' && Number.isFinite(persisted.page)
+        ? Math.max(1, Math.round(persisted.page))
+        : 1,
+    pageSizeByMode: {
+      regular: regularPageSize,
+      compact: compactPageSize,
+    },
+    sortMode: isAuthFilesSortMode(persisted?.sortMode) ? persisted.sortMode : 'default',
+  };
+};
+
 export function AuthFilesPage() {
   const { t } = useTranslation();
   const showNotification = useNotificationStore((state) => state.showNotification);
@@ -101,20 +171,25 @@ export function AuthFilesPage() {
   const isCurrentLayer = pageTransitionLayer ? pageTransitionLayer.status === 'current' : true;
   const navigate = useNavigate();
 
-  const [filter, setFilter] = useState<'all' | string>('all');
-  const [statusFilterMode, setStatusFilterMode] = useState<AuthFilesStatusFilterMode>('all');
-  const [compactMode, setCompactMode] = useState(false);
-  const [search, setSearch] = useState('');
-  const [page, setPage] = useState(1);
-  const [pageSizeByMode, setPageSizeByMode] = useState({
-    regular: DEFAULT_REGULAR_PAGE_SIZE,
-    compact: DEFAULT_COMPACT_PAGE_SIZE,
-  });
-  const [pageSizeInput, setPageSizeInput] = useState('9');
+  const [initialUiState] = useState(readInitialAuthFilesPageState);
+  const [filter, setFilter] = useState<'all' | string>(initialUiState.filter);
+  const [statusFilterMode, setStatusFilterMode] = useState<AuthFilesStatusFilterMode>(
+    initialUiState.statusFilterMode
+  );
+  const [compactMode, setCompactMode] = useState(initialUiState.compactMode);
+  const [search, setSearch] = useState(initialUiState.search);
+  const [page, setPage] = useState(initialUiState.page);
+  const [pageSizeByMode, setPageSizeByMode] = useState(initialUiState.pageSizeByMode);
+  const [pageSizeInput, setPageSizeInput] = useState(() =>
+    String(
+      initialUiState.compactMode
+        ? initialUiState.pageSizeByMode.compact
+        : initialUiState.pageSizeByMode.regular
+    )
+  );
   const [viewMode, setViewMode] = useState<'diagram' | 'list'>('list');
-  const [sortMode, setSortMode] = useState<AuthFilesSortMode>('default');
+  const [sortMode, setSortMode] = useState<AuthFilesSortMode>(initialUiState.sortMode);
   const [batchActionBarVisible, setBatchActionBarVisible] = useState(false);
-  const [uiStateHydrated, setUiStateHydrated] = useState(false);
   const floatingBatchActionsRef = useRef<HTMLDivElement>(null);
   const batchActionAnimationRef = useRef<AnimationPlaybackControlsWithThen | null>(null);
   const previousSelectionCountRef = useRef(0);
@@ -204,65 +279,6 @@ export function AuthFilesPage() {
   const enabledOnly = statusFilterMode === 'enabled';
 
   useEffect(() => {
-    const persistedCompactMode = readPersistedAuthFilesCompactMode();
-    if (typeof persistedCompactMode === 'boolean') {
-      setCompactMode(persistedCompactMode);
-    }
-
-    const persisted = readAuthFilesUiState();
-    if (persisted) {
-      if (typeof persisted.filter === 'string' && persisted.filter.trim()) {
-        setFilter(normalizeProviderKey(persisted.filter));
-      }
-      const persistedStatusFilterMode = normalizePersistedStatusFilterMode(
-        persisted.statusFilterMode
-      );
-      if (persistedStatusFilterMode) {
-        setStatusFilterMode(persistedStatusFilterMode);
-      } else if (
-        typeof persisted.problemOnly === 'boolean' ||
-        typeof persisted.disabledOnly === 'boolean'
-      ) {
-        setStatusFilterMode(
-          resolveStatusFilterMode(persisted.problemOnly === true, persisted.disabledOnly === true)
-        );
-      }
-      if (typeof persistedCompactMode !== 'boolean' && typeof persisted.compactMode === 'boolean') {
-        setCompactMode(persisted.compactMode);
-      }
-      if (typeof persisted.search === 'string') {
-        setSearch(persisted.search);
-      }
-      if (typeof persisted.page === 'number' && Number.isFinite(persisted.page)) {
-        setPage(Math.max(1, Math.round(persisted.page)));
-      }
-      const legacyPageSize =
-        typeof persisted.pageSize === 'number' && Number.isFinite(persisted.pageSize)
-          ? clampCardPageSize(persisted.pageSize)
-          : null;
-      const regularPageSize =
-        typeof persisted.regularPageSize === 'number' && Number.isFinite(persisted.regularPageSize)
-          ? clampCardPageSize(persisted.regularPageSize)
-          : (legacyPageSize ?? DEFAULT_REGULAR_PAGE_SIZE);
-      const compactPageSize =
-        typeof persisted.compactPageSize === 'number' && Number.isFinite(persisted.compactPageSize)
-          ? clampCardPageSize(persisted.compactPageSize)
-          : (legacyPageSize ?? DEFAULT_COMPACT_PAGE_SIZE);
-      setPageSizeByMode({
-        regular: regularPageSize,
-        compact: compactPageSize,
-      });
-      if (isAuthFilesSortMode(persisted.sortMode)) {
-        setSortMode(persisted.sortMode);
-      }
-    }
-
-    setUiStateHydrated(true);
-  }, []);
-
-  useEffect(() => {
-    if (!uiStateHydrated) return;
-
     writeAuthFilesUiState({
       filter,
       statusFilterMode,
@@ -288,11 +304,17 @@ export function AuthFilesPage() {
     search,
     sortMode,
     statusFilterMode,
-    uiStateHydrated,
   ]);
 
   useEffect(() => {
-    setPageSizeInput(String(pageSize));
+    let cancelled = false;
+    queueMicrotask(() => {
+      if (cancelled) return;
+      setPageSizeInput(String(pageSize));
+    });
+    return () => {
+      cancelled = true;
+    };
   }, [pageSize]);
 
   const setCurrentModePageSize = useCallback(
@@ -532,7 +554,14 @@ export function AuthFilesPage() {
   useEffect(() => {
     selectionCountRef.current = selectionCount;
     if (selectionCount > 0) {
-      setBatchActionBarVisible(true);
+      let cancelled = false;
+      queueMicrotask(() => {
+        if (cancelled) return;
+        setBatchActionBarVisible(true);
+      });
+      return () => {
+        cancelled = true;
+      };
     }
   }, [selectionCount]);
 

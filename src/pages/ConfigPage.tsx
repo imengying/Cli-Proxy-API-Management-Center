@@ -136,18 +136,32 @@ export function ConfigPage() {
   }, [loadVisualValuesFromYaml, t]);
 
   useEffect(() => {
-    loadConfig();
+    let cancelled = false;
+    queueMicrotask(() => {
+      if (cancelled) return;
+      loadConfig();
+    });
+    return () => {
+      cancelled = true;
+    };
   }, [loadConfig]);
 
   useEffect(() => {
     if (activeTab !== 'visual' || !visualParseError) return;
 
-    setActiveTab('source');
-    localStorage.setItem('config-management:tab', 'source');
-    showNotification(
-      t('config_management.visual_mode_unavailable_detail', { message: visualParseError }),
-      'error'
-    );
+    let cancelled = false;
+    queueMicrotask(() => {
+      if (cancelled) return;
+      setActiveTab('source');
+      localStorage.setItem('config-management:tab', 'source');
+      showNotification(
+        t('config_management.visual_mode_unavailable_detail', { message: visualParseError }),
+        'error'
+      );
+    });
+    return () => {
+      cancelled = true;
+    };
   }, [activeTab, showNotification, t, visualParseError]);
 
   const handleConfirmSave = async () => {

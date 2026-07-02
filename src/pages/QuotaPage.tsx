@@ -45,7 +45,14 @@ export function QuotaPage() {
   useHeaderRefresh(loadFiles);
 
   useEffect(() => {
-    loadFiles();
+    let cancelled = false;
+    queueMicrotask(() => {
+      if (cancelled) return;
+      loadFiles();
+    });
+    return () => {
+      cancelled = true;
+    };
   }, [loadFiles]);
 
   return (

@@ -69,7 +69,14 @@ export function PluginResourcePage() {
   useHeaderRefresh(loadResource, connected);
 
   useEffect(() => {
-    void loadResource();
+    let cancelled = false;
+    queueMicrotask(() => {
+      if (cancelled) return;
+      void loadResource();
+    });
+    return () => {
+      cancelled = true;
+    };
   }, [loadResource]);
 
   useEffect(() => {

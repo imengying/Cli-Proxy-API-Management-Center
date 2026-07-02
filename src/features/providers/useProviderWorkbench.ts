@@ -252,7 +252,16 @@ export function useProviderWorkbench(): UseProviderWorkbenchResult {
     if (hasFetchedRef.current) return;
     if (!connected) return;
     hasFetchedRef.current = true;
-    refetch().catch(() => {});
+
+    let cancelled = false;
+    queueMicrotask(() => {
+      if (cancelled) return;
+      refetch().catch(() => {});
+    });
+
+    return () => {
+      cancelled = true;
+    };
   }, [connected, refetch]);
 
   /* ------------------- snapshot 计算 ------------------- */

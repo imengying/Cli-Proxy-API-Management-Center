@@ -141,18 +141,27 @@ export function useAuthFilesData(): UseAuthFilesDataResult {
   useEffect(() => {
     if (selectedFiles.size === 0) return;
     const existingNames = new Set(files.map((file) => file.name));
-    setSelectedFiles((prev) => {
-      let changed = false;
-      const next = new Set<string>();
-      prev.forEach((name) => {
-        if (existingNames.has(name)) {
-          next.add(name);
-        } else {
-          changed = true;
-        }
+
+    let cancelled = false;
+    queueMicrotask(() => {
+      if (cancelled) return;
+      setSelectedFiles((prev) => {
+        let changed = false;
+        const next = new Set<string>();
+        prev.forEach((name) => {
+          if (existingNames.has(name)) {
+            next.add(name);
+          } else {
+            changed = true;
+          }
+        });
+        return changed ? next : prev;
       });
-      return changed ? next : prev;
     });
+
+    return () => {
+      cancelled = true;
+    };
   }, [files, selectedFiles.size]);
 
   const loadFiles = useCallback(async () => {
