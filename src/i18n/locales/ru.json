@@ -57,9 +57,7 @@
     "unsaved_changes_message": "У вас есть несохранённые изменения. Если вы уйдёте, они будут потеряны. Выйти?"
   },
   "title": {
-    "main": "Центр управления CLI Proxy API",
-    "login": "Центр управления CLI Proxy API",
-    "abbr": "CPAMC"
+    "login": "Центр управления CLI Proxy API"
   },
   "splash": {
     "title": "CLI Proxy API",
@@ -98,7 +96,6 @@
     "error_ssl": "Ошибка проверки SSL/TLS сертификата"
   },
   "header": {
-    "check_connection": "Проверить подключение",
     "refresh_all": "Обновить всё",
     "logout": "Выйти"
   },
@@ -110,8 +107,6 @@
   },
   "nav": {
     "dashboard": "Панель",
-    "basic_settings": "Основные настройки",
-    "api_keys": "API ключи",
     "ai_providers": "Поставщики AI",
     "auth_files": "Файлы аутентификации",
     "oauth": "OAuth вход",
@@ -198,20 +193,6 @@
     "routing_strategy_round_robin": "round-robin (цикл)",
     "routing_strategy_fill_first": "fill-first (приоритет)"
   },
-  "api_keys": {
-    "title": "Управление API-ключами",
-    "proxy_auth_title": "Ключи аутентификации прокси-сервиса",
-    "add_button": "Добавить ключ",
-    "empty_title": "API-ключи отсутствуют",
-    "empty_desc": "Нажмите кнопку выше, чтобы добавить первый ключ",
-    "item_title": "API-ключ",
-    "add_modal_title": "Добавление API-ключа",
-    "add_modal_key_label": "API-ключ:",
-    "add_modal_key_placeholder": "Введите API-ключ",
-    "edit_modal_title": "Редактирование API-ключа",
-    "edit_modal_key_label": "API-ключ:",
-    "delete_confirm": "Удалить этот API-ключ?"
-  },
   "auth_files": {
     "title": "Управление файлами авторизации",
     "title_section": "Файлы авторизации",
@@ -268,11 +249,6 @@
     "pagination_info": "Страница {{current}} / {{total}} · {{count}} файлов",
     "search_label": "Поиск конфигов",
     "search_placeholder": "Фильтр по имени, типу или провайдеру, поддерживается wildcard *",
-    "problem_filter_label": "Фильтр статуса",
-    "problem_filter_all": "Все",
-    "problem_filter_enabled": "Вкл.",
-    "problem_filter_problem": "Пробл.",
-    "problem_filter_disabled": "Откл.",
     "problem_filter_only": "Показывать только проблемные учётные данные",
     "disabled_filter_only": "Показывать только отключённые учётные данные",
     "enabled_filter_only": "Показывать только исправные учётные данные",

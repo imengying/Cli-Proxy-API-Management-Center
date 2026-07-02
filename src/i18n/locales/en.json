@@ -57,9 +57,7 @@
     "unsaved_changes_message": "You have unsaved changes. Leaving now will discard them. Do you want to leave?"
   },
   "title": {
-    "main": "CLI Proxy API Management Center",
-    "login": "CLI Proxy API Management Center",
-    "abbr": "CPAMC"
+    "login": "CLI Proxy API Management Center"
   },
   "splash": {
     "title": "CLI Proxy API",
@@ -98,7 +96,6 @@
     "error_ssl": "SSL/TLS certificate verification failed"
   },
   "header": {
-    "check_connection": "Check Connection",
     "refresh_all": "Refresh All",
     "logout": "Logout"
   },
@@ -110,8 +107,6 @@
   },
   "nav": {
     "dashboard": "Dashboard",
-    "basic_settings": "Basic Settings",
-    "api_keys": "API Keys",
     "ai_providers": "AI Providers",
     "auth_files": "Auth Files",
     "oauth": "OAuth Login",
@@ -199,20 +194,6 @@
     "routing_strategy_round_robin": "round-robin (cycle)",
     "routing_strategy_fill_first": "fill-first (prioritize)"
   },
-  "api_keys": {
-    "title": "API Keys Management",
-    "proxy_auth_title": "Proxy Service Authentication Keys",
-    "add_button": "Add Key",
-    "empty_title": "No API Keys",
-    "empty_desc": "Click the button above to add the first key",
-    "item_title": "API Key",
-    "add_modal_title": "Add API Key",
-    "add_modal_key_label": "API Key:",
-    "add_modal_key_placeholder": "Please enter API key",
-    "edit_modal_title": "Edit API Key",
-    "edit_modal_key_label": "API Key:",
-    "delete_confirm": "Are you sure you want to delete this API key?"
-  },
   "auth_files": {
     "title": "Auth Files Management",
     "title_section": "Auth Files",
@@ -269,11 +250,6 @@
     "pagination_info": "Page {{current}} / {{total}} · {{count}} files",
     "search_label": "Search configs",
     "search_placeholder": "Filter by name, type, or provider. Use * as a wildcard",
-    "problem_filter_label": "Status Filter",
-    "problem_filter_all": "All",
-    "problem_filter_enabled": "Enabled",
-    "problem_filter_problem": "Problem",
-    "problem_filter_disabled": "Disabled",
     "problem_filter_only": "Only show problematic credentials",
     "disabled_filter_only": "Only show disabled credentials",
     "enabled_filter_only": "Only show healthy credentials",
