@@ -53,76 +53,58 @@
   line-height: 1.5;
 }
 
-.headerMeta {
+.connectionBlock {
+  min-width: min(360px, 40vw);
   display: flex;
-  min-width: 0;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 4px;
+  text-align: right;
+}
+
+.connectionEyebrow {
+  display: inline-flex;
+  min-height: 20px;
   align-items: center;
   justify-content: flex-end;
-  flex-wrap: wrap;
-  gap: $spacing-sm;
-}
-
-.timeCard,
-.statusBadge {
-  min-height: 40px;
-  display: inline-flex;
-  align-items: center;
-  gap: $spacing-sm;
-  border: 1px solid var(--border-color);
-  border-radius: $radius-md;
-  background: var(--bg-secondary);
-  padding: 8px 10px;
+  gap: 7px;
   color: var(--text-secondary);
-}
-
-.timeCard {
-  > span {
-    width: 16px;
-    color: var(--text-tertiary);
-    text-align: center;
-  }
-
-  div {
-    display: grid;
-    gap: 1px;
-  }
-}
-
-.time {
-  color: var(--text-primary);
-  font-size: 14px;
-  font-weight: 700;
-  line-height: 1;
-  font-variant-numeric: tabular-nums;
-}
-
-.date {
-  color: var(--text-secondary);
-  font-size: 12px;
-  white-space: nowrap;
-}
-
-.statusBadge {
   font-size: 13px;
   font-weight: 650;
+}
+
+.connectionTitle {
+  margin: 2px 0 0;
+  max-width: 100%;
+  color: var(--foreground);
+  font-size: 24px;
+  font-weight: 650;
+  line-height: 1.15;
+  letter-spacing: 0;
 
   &.connected {
     color: var(--success-color);
-    border-color: color-mix(in srgb, var(--success-color) 34%, var(--border-color));
-    background: color-mix(in srgb, var(--success-color) 10%, var(--bg-secondary));
   }
 
   &.connecting {
     color: var(--quota-medium-color);
-    border-color: color-mix(in srgb, var(--quota-medium-color) 34%, var(--border-color));
-    background: color-mix(in srgb, var(--quota-medium-color) 10%, var(--bg-secondary));
   }
 
   &.disconnected {
     color: var(--error-color);
-    border-color: color-mix(in srgb, var(--error-color) 34%, var(--border-color));
-    background: color-mix(in srgb, var(--error-color) 10%, var(--bg-secondary));
   }
+}
+
+.connectionSubtitle {
+  max-width: min(520px, 42vw);
+  margin: 0;
+  color: var(--muted-foreground);
+  font-family: $font-mono;
+  font-size: 12px;
+  line-height: 1.5;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 .statusDot {
@@ -143,11 +125,6 @@
   &.disconnected {
     background: var(--error-color);
   }
-}
-
-.buildDate {
-  color: var(--text-tertiary);
-  font-size: 12px;
 }
 
 .section {
@@ -408,8 +385,18 @@
     padding: $spacing-md;
   }
 
-  .headerMeta {
+  .connectionBlock {
+    min-width: 0;
+    align-items: flex-start;
+    text-align: left;
+  }
+
+  .connectionEyebrow {
     justify-content: flex-start;
+  }
+
+  .connectionSubtitle {
+    max-width: 100%;
   }
 
   .statsGrid,
@@ -421,7 +408,4 @@
     font-size: 24px;
   }
 
-  .timeCard {
-    width: 100%;
-  }
 }

@@ -1302,9 +1302,6 @@
   "system_info": {
     "title": "Информация о центре управления",
     "about_title": "CLI Proxy API Management Center",
-    "connection_status_title": "Статус подключения",
-    "api_status_label": "Статус API:",
-    "config_status_label": "Статус конфигурации:",
     "last_update_label": "Последнее обновление:",
     "cache_data": "Данные из кэша",
     "real_time_data": "Данные в реальном времени",
@@ -1457,8 +1454,7 @@
     },
     "categories": {
       "title": "Провайдеры",
-      "activeCount": "{{active}}/{{total}} активных",
-      "sponsors": "Спонсоры"
+      "activeCount": "{{active}}/{{total}} активных"
     },
     "providerNames": {
       "gemini": "Gemini",
@@ -1466,8 +1462,7 @@
       "claude": "Claude",
       "vertex": "Vertex",
       "openaiCompatibility": "OpenAI-совместимый",
-      "ampcode": "AmpCode",
-      "apikeyFun": "APIKEY.FUN"
+      "ampcode": "AmpCode"
     },
     "table": {
       "key": "Ключ",
@@ -1487,61 +1482,6 @@
       "filterPlaceholder": "Поиск по ключам, URL, префиксам…",
       "description": "Управление ресурсами {{route}}",
       "providerIssue": "Проблема с провайдером"
-    },
-    "sponsor": {
-      "protocolSummary": "Anthropic / OpenAI / Codex API (Responses)",
-      "detailHint": "Этот спонсор сохраняется как записи Claude API key, OpenAI-compatible и Codex API key; здесь они управляются вместе.",
-      "registerLink": "Зарегистрироваться",
-      "registerNow": "Зарегистрироваться сейчас",
-      "dashboardLink": "Панель управления",
-      "emptyRegisterHint": "Конфигурации пока нет.",
-      "apiKeyHint": "Этот ключ записывается только в выбранную группу/протокол.",
-      "usageCheck": "Проверить квоту",
-      "usageChecking": "Проверка",
-      "usageRemaining": "Остаток: {{amount}} {{unit}}",
-      "usageBreakdown": "Использовано {{used}} / Лимит {{limit}}",
-      "usageStatus": "Статус: {{status}}",
-      "usageInvalid": "Недействительный ключ",
-      "usageEmpty": "Endpoint не вернул данные квоты.",
-      "usageApiKeyRequired": "Требуется API key",
-      "groupedKeysTitle": "Групповые ключи",
-      "groupedKeysHint": "Ключи APIKEY.FUN привязываются к группе при создании на платформе. Каждый групповой ключ здесь управляет одним протоколом, а модели загружаются только из этого протокола.",
-      "groupedKey": "Групповой ключ #{{index}}",
-      "addGroupedKey": "Добавить групповой ключ",
-      "removeGroupedKey": "Удалить групповой ключ",
-      "protocol": "Группа/протокол",
-      "protocolHint": "Выберите группу APIKEY.FUN, к которой привязан этот ключ.",
-      "protocolEndpoint": "Текущий endpoint протокола",
-      "urlMode": "APIKEY.FUN URL",
-      "urlHint": "Оба URL используют одинаковые правила API. При сохранении записывается только endpoint текущего группового протокола.",
-      "urlOptions": {
-        "standard": "Обычный URL",
-        "direct": "Прямой URL"
-      },
-      "modelsTitle": "Настройки моделей по протоколам",
-      "modelsHint": "Настраивайте allowlist моделей и алиасы отдельно для маршрутов APIKEY.FUN Codex API, Anthropic и OpenAI-compatible.",
-      "protocolModels": {
-        "codex": "Модели Codex API",
-        "anthropic": "Модели Anthropic",
-        "openai": "Модели OpenAI-compatible"
-      },
-      "protocolModelHints": {
-        "codex": "Записывается в models конфигурации Codex API. Можно загрузить из /v1/models и задать алиасы.",
-        "anthropic": "Записывается в models конфигурации Anthropic. Можно загрузить из /v1/models и задать алиасы.",
-        "openai": "Записывается в models конфигурации OpenAI-compatible. Можно загрузить из /models и задать алиасы."
-      },
-      "validation": {
-        "keyRequired": "Введите API key для каждого группового ключа.",
-        "protocolDuplicate": "Для каждого протокола можно добавить только один групповой ключ."
-      },
-      "openaiEntries": "Ключей OpenAI-compatible",
-      "codexEntries": "Ключей Codex API",
-      "anthropicEntries": "Ключей Anthropic",
-      "protocols": {
-        "anthropic": "Anthropic",
-        "openai": "OpenAI-compatible",
-        "codexResponses": "Codex API (Responses)"
-      }
     },
     "ampcode": {
       "detailHint": "Настройка upstream-маршрута Amp CLI, сопоставлений клиентских ключей и моделей.",

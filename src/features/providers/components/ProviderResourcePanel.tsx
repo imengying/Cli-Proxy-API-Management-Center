@@ -1,8 +1,7 @@
 import { useTranslation } from 'react-i18next';
-import { IconExternalLink, IconPlus, IconSearch } from '@/components/ui/icons';
+import { IconPlus, IconSearch } from '@/components/ui/icons';
 import type { ProviderRecentUsageMap } from '@/components/providers/utils';
 import { PROVIDER_LOGOS } from '../brandLogos';
-import { APIKEY_FUN_AFFILIATE_URL, APIKEY_FUN_DASHBOARD_URL } from '../sponsor';
 import type { ProviderGroup, ProviderResource } from '../types';
 import { ProviderResourceTable } from './ProviderResourceTable';
 import { ProviderResourceToolbar } from './ProviderResourceToolbar';
@@ -54,13 +53,9 @@ export function ProviderResourcePanel({
   const logo = PROVIDER_LOGOS[group.id];
   const providerTitle = t(`providersPage.providerNames.${group.id}`);
   const hasProviderInfo = group.resources.some((r) => !r.flags.isPlaceholder);
-  const showSponsorRegistrationLink = group.id === 'apikeyFun' && !hasProviderInfo;
-  const showSponsorDashboardLink = group.id === 'apikeyFun' && hasProviderInfo;
   const showAmpcodeConfigure = group.id === 'ampcode' && !hasProviderInfo;
   let emptyText = t('providersPage.table.empty');
-  if (showSponsorRegistrationLink) {
-    emptyText = t('providersPage.sponsor.emptyRegisterHint');
-  } else if (showAmpcodeConfigure) {
+  if (showAmpcodeConfigure) {
     emptyText = t('providersPage.ampcode.empty');
   }
   const logoClassName = [
@@ -84,9 +79,6 @@ export function ProviderResourcePanel({
         </>
       ) : null}
       <h2 className={styles.title}>{providerTitle}</h2>
-      {showSponsorDashboardLink ? (
-        <IconExternalLink className={styles.titleExternalIcon} size={16} />
-      ) : null}
     </>
   );
 
@@ -95,32 +87,7 @@ export function ProviderResourcePanel({
       <div className={styles.header}>
         <div className={styles.headerMain}>
           <div className={styles.titleArea}>
-            {showSponsorDashboardLink ? (
-              <a
-                className={`${styles.titleRow} ${styles.titleLink}`}
-                href={APIKEY_FUN_DASHBOARD_URL}
-                target="_blank"
-                rel="noreferrer"
-                title={t('providersPage.sponsor.dashboardLink')}
-              >
-                {titleContent}
-              </a>
-            ) : (
-              <div className={styles.titleRow}>{titleContent}</div>
-            )}
-            {showSponsorDashboardLink ? (
-              <a
-                className={styles.sponsorLink}
-                href={APIKEY_FUN_DASHBOARD_URL}
-                target="_blank"
-                rel="noreferrer"
-              >
-                <span className={styles.sponsorLinkText}>
-                  {t('providersPage.sponsor.dashboardLink')}
-                </span>
-                <IconExternalLink className={styles.sponsorLinkIcon} size={14} />
-              </a>
-            ) : null}
+            <div className={styles.titleRow}>{titleContent}</div>
           </div>
           <div className={styles.searchWrap}>
             <span className={styles.searchIcon} aria-hidden="true">
@@ -155,26 +122,14 @@ export function ProviderResourcePanel({
         <div className={styles.empty}>
           <div>{emptyText}</div>
           <div className={styles.emptyAction}>
-            {showSponsorRegistrationLink ? (
-              <a
-                className={`${styles.emptyActionButton} ${styles.emptyActionButtonEmphasis}`}
-                href={APIKEY_FUN_AFFILIATE_URL}
-                target="_blank"
-                rel="noreferrer"
-              >
-                <IconExternalLink size={16} />
-                <span>{t('providersPage.sponsor.registerLink')}</span>
-              </a>
-            ) : (
-              <button type="button" className={styles.emptyActionButton} onClick={onCreate}>
-                <IconPlus size={16} />
-                <span>
-                  {showAmpcodeConfigure
-                    ? t('providersPage.actions.configure')
-                    : t('providersPage.actions.new')}
-                </span>
-              </button>
-            )}
+            <button type="button" className={styles.emptyActionButton} onClick={onCreate}>
+              <IconPlus size={16} />
+              <span>
+                {showAmpcodeConfigure
+                  ? t('providersPage.actions.configure')
+                  : t('providersPage.actions.new')}
+              </span>
+            </button>
           </div>
         </div>
       ) : (

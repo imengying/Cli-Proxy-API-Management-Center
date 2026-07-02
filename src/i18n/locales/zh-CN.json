@@ -1324,9 +1324,6 @@
   "system_info": {
     "title": "管理中心信息",
     "about_title": "CLI Proxy API Management Center",
-    "connection_status_title": "连接状态",
-    "api_status_label": "API 状态:",
-    "config_status_label": "配置状态:",
     "last_update_label": "最后更新:",
     "cache_data": "缓存数据",
     "real_time_data": "实时数据",
@@ -1479,8 +1476,7 @@
     },
     "categories": {
       "title": "提供商",
-      "activeCount": "{{active}}/{{total}} 活跃",
-      "sponsors": "赞助商"
+      "activeCount": "{{active}}/{{total}} 活跃"
     },
     "providerNames": {
       "gemini": "Gemini",
@@ -1488,8 +1484,7 @@
       "claude": "Claude",
       "vertex": "Vertex",
       "openaiCompatibility": "OpenAI 兼容",
-      "ampcode": "AmpCode",
-      "apikeyFun": "APIKEY.FUN"
+      "ampcode": "AmpCode"
     },
     "table": {
       "key": "密钥",
@@ -1509,61 +1504,6 @@
       "filterPlaceholder": "搜索密钥、地址、前缀…",
       "description": "在 {{route}} 下管理资源",
       "providerIssue": "此提供商存在问题"
-    },
-    "sponsor": {
-      "protocolSummary": "Anthropic / OpenAI / Codex API (Responses)",
-      "detailHint": "此赞助商会分别写入 Claude API Key、OpenAI 兼容配置与 Codex API Key,这里只做聚合管理。",
-      "registerLink": "点此注册",
-      "registerNow": "立即注册",
-      "dashboardLink": "控制面板",
-      "emptyRegisterHint": "尚未添加配置",
-      "apiKeyHint": "此 Key 只会写入当前选择的分组/协议配置。",
-      "usageCheck": "查询额度",
-      "usageChecking": "查询中",
-      "usageRemaining": "剩余额度: {{amount}} {{unit}}",
-      "usageBreakdown": "已用 {{used}} / 总额 {{limit}}",
-      "usageStatus": "状态: {{status}}",
-      "usageInvalid": "Key 无效",
-      "usageEmpty": "端点未返回额度数据",
-      "usageApiKeyRequired": "API 密钥必填",
-      "groupedKeysTitle": "分组 Key",
-      "groupedKeysHint": "APIKEY.FUN 在平台创建 Key 时需要选择分组,这里每个分组 Key 只管理一个协议,模型也只从该协议拉取。",
-      "groupedKey": "分组 Key #{{index}}",
-      "addGroupedKey": "添加分组 Key",
-      "removeGroupedKey": "删除分组 Key",
-      "protocol": "分组/协议",
-      "protocolHint": "请选择此 Key 在 APIKEY.FUN 平台绑定的分组。",
-      "protocolEndpoint": "当前协议地址",
-      "urlMode": "APIKEY.FUN URL",
-      "urlHint": "两种 URL 的使用规范一致,保存时只会写入当前分组协议对应地址。",
-      "urlOptions": {
-        "standard": "普通 URL",
-        "direct": "专线直连 URL"
-      },
-      "modelsTitle": "协议模型配置",
-      "modelsHint": "可分别限制或别名映射 APIKEY.FUN 走 Codex API、Anthropic 与 OpenAI 兼容入口的模型。",
-      "protocolModels": {
-        "codex": "Codex API 模型",
-        "anthropic": "Anthropic 模型",
-        "openai": "OpenAI 兼容模型"
-      },
-      "protocolModelHints": {
-        "codex": "写入 Codex API 配置的 models,可从 /v1/models 拉取后设置别名。",
-        "anthropic": "写入 Anthropic 配置的 models,可从 /v1/models 拉取后设置别名。",
-        "openai": "写入 OpenAI 兼容配置的 models,可从 /models 拉取后设置别名。"
-      },
-      "validation": {
-        "keyRequired": "请为每个分组 Key 填写 API Key。",
-        "protocolDuplicate": "每个协议只能添加一个分组 Key。"
-      },
-      "openaiEntries": "OpenAI 兼容密钥数",
-      "codexEntries": "Codex API 密钥数",
-      "anthropicEntries": "Anthropic 密钥数",
-      "protocols": {
-        "anthropic": "Anthropic",
-        "openai": "OpenAI 兼容",
-        "codexResponses": "Codex API (Responses)"
-      }
     },
     "ampcode": {
       "detailHint": "配置 Amp CLI 的上游路由、客户端 Key 映射与模型映射。",

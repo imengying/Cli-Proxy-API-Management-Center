@@ -11,7 +11,6 @@ import type { UseProviderWorkbenchResult } from '../useProviderWorkbench';
 import { BaseProviderForm } from './forms/BaseProviderForm';
 import { ResourceDetailView } from './ResourceDetailView';
 import { AmpcodeForm } from './forms/AmpcodeForm';
-import { SponsorProviderForm } from './forms/SponsorProviderForm';
 import styles from './forms/sharedForm.module.scss';
 
 type SheetMode = 'detail' | 'create' | 'edit';
@@ -162,19 +161,6 @@ export function ProviderSheet({
       return <ResourceDetailView resource={state.resource} usageByProvider={usageByProvider} />;
     }
     const formKey = `${state.brand}:${state.resource?.id ?? 'new'}:${state.mode}`;
-    if (state.brand === 'apikeyFun') {
-      return (
-        <SponsorProviderForm
-          key={formKey}
-          resource={state.resource}
-          mode={state.mode}
-          mutating={formMutating}
-          formId={formId}
-          onSubmit={state.mode === 'create' ? handleCreate : handleUpdate}
-          onDirtyChange={handleDirtyChange}
-        />
-      );
-    }
     if (state.brand === 'ampcode') {
       return (
         <AmpcodeForm
@@ -274,8 +260,6 @@ export function ProviderSheet({
             ? '/ai-providers/openai'
             : state.brand === 'ampcode'
               ? '/ai-providers/ampcode'
-            : state.brand === 'apikeyFun'
-              ? '/ai-providers'
               : `/ai-providers/${state.brand}`,
       })}
       footer={footer}

@@ -11,7 +11,6 @@ import {
 import { useAuthStore, useConfigStore, useModelsStore } from '@/stores';
 import { authFilesApi } from '@/services/api';
 import { useApiKeysForModels } from '@/hooks/useApiKeysForModels';
-import { formatDateValue } from '@/utils/format';
 import styles from './DashboardPage.module.scss';
 
 interface QuickStat {
@@ -34,10 +33,8 @@ function getTimeOfDay(): TimeOfDay {
 }
 
 export function DashboardPage() {
-  const { t, i18n } = useTranslation();
+  const { t } = useTranslation();
   const connectionStatus = useAuthStore((state) => state.connectionStatus);
-  const serverVersion = useAuthStore((state) => state.serverVersion);
-  const serverBuildDate = useAuthStore((state) => state.serverBuildDate);
   const apiBase = useAuthStore((state) => state.apiBase);
   const config = useConfigStore((state) => state.config);
   const fetchConfig = useConfigStore((state) => state.fetchConfig);
@@ -51,13 +48,11 @@ export function DashboardPage() {
 
   // Time-of-day state for dynamic greeting
   const [timeOfDay, setTimeOfDay] = useState<TimeOfDay>(getTimeOfDay);
-  const [currentTime, setCurrentTime] = useState(() => new Date());
 
-  // Update time every 60 seconds
+  // Update greeting bucket every 60 seconds.
   useEffect(() => {
     const id = setInterval(() => {
       setTimeOfDay(getTimeOfDay());
-      setCurrentTime(new Date());
     }, 60_000);
     return () => clearInterval(id);
   }, []);
@@ -190,19 +185,15 @@ export function DashboardPage() {
   // Derived time-based values
   const greetingKey = `dashboard.greeting_${timeOfDay}`;
   const caringKey = `dashboard.caring_${timeOfDay}`;
-
-  const formattedDate = currentTime.toLocaleDateString(i18n.language, {
-    weekday: 'long',
-    year: 'numeric',
-    month: 'long',
-    day: 'numeric',
-  });
-
-  const formattedTime = currentTime.toLocaleTimeString(i18n.language, {
-    hour: '2-digit',
-    minute: '2-digit',
-  });
-  const serverBuildDateDisplay = formatDateValue(serverBuildDate, i18n.language);
+  const connectionStatusLabel = t(`common.${connectionStatus}_status`);
+  const connectionLabel = t('connection.status').replace(/[：:]\s*$/, '');
+  const connectionAddress = apiBase || '-';
+  const connectionStateClass =
+    connectionStatus === 'connected'
+      ? styles.connected
+      : connectionStatus === 'connecting'
+        ? styles.connecting
+        : styles.disconnected;
 
   return (
     <div className={styles.dashboard}>
@@ -212,47 +203,17 @@ export function DashboardPage() {
           <h1 className={styles.pageTitle}>{t('dashboard.welcome_back')}</h1>
           <p className={styles.pageSubtitle}>{t(caringKey)}</p>
         </div>
-        <div className={styles.headerMeta}>
-          <div className={styles.timeCard}>
-            <span aria-hidden="true">◷</span>
-            <div>
-              <span className={styles.time}>{formattedTime}</span>
-              <span className={styles.date}>{formattedDate}</span>
-            </div>
-          </div>
-          <div
-            className={`${styles.statusBadge} ${
-              connectionStatus === 'connected'
-                ? styles.connected
-                : connectionStatus === 'connecting'
-                  ? styles.connecting
-                  : styles.disconnected
-            }`}
-          >
-            <span
-              className={`${styles.statusDot} ${
-                connectionStatus === 'connected'
-                  ? styles.connected
-                  : connectionStatus === 'connecting'
-                    ? styles.connecting
-                    : styles.disconnected
-              }`}
-            />
-            <span>
-              {serverVersion
-                ? `v${serverVersion.trim().replace(/^[vV]+/, '')}`
-                : t(
-                    connectionStatus === 'connected'
-                      ? 'common.connected'
-                      : connectionStatus === 'connecting'
-                        ? 'common.connecting'
-                        : 'common.disconnected'
-                  )}
-            </span>
-          </div>
-          {serverBuildDateDisplay && (
-            <span className={styles.buildDate}>{serverBuildDateDisplay}</span>
-          )}
+        <div className={styles.connectionBlock}>
+          <span className={styles.connectionEyebrow}>
+            <span className={`${styles.statusDot} ${connectionStateClass}`} />
+            {connectionLabel}
+          </span>
+          <h2 className={`${styles.connectionTitle} ${connectionStateClass}`}>
+            {connectionStatusLabel}
+          </h2>
+          <p className={styles.connectionSubtitle} title={connectionAddress}>
+            {connectionAddress}
+          </p>
         </div>
       </section>
 

@@ -1324,9 +1324,6 @@
   "system_info": {
     "title": "Management Center Info",
     "about_title": "CLI Proxy API Management Center",
-    "connection_status_title": "Connection Status",
-    "api_status_label": "API Status:",
-    "config_status_label": "Config Status:",
     "last_update_label": "Last Update:",
     "cache_data": "Cache Data",
     "real_time_data": "Real-time Data",
@@ -1479,8 +1476,7 @@
     },
     "categories": {
       "title": "Providers",
-      "activeCount": "{{active}}/{{total}} active",
-      "sponsors": "Sponsors"
+      "activeCount": "{{active}}/{{total}} active"
     },
     "providerNames": {
       "gemini": "Gemini",
@@ -1488,8 +1484,7 @@
       "claude": "Claude",
       "vertex": "Vertex",
       "openaiCompatibility": "OpenAI Compatible",
-      "ampcode": "AmpCode",
-      "apikeyFun": "APIKEY.FUN"
+      "ampcode": "AmpCode"
     },
     "table": {
       "key": "Key",
@@ -1509,61 +1504,6 @@
       "filterPlaceholder": "Search keys, URLs, prefixes…",
       "description": "Manage resources under {{route}}",
       "providerIssue": "This provider has an issue"
-    },
-    "sponsor": {
-      "protocolSummary": "Anthropic / OpenAI / Codex API (Responses)",
-      "detailHint": "This sponsor is persisted as Claude API key, OpenAI-compatible, and Codex API key entries; this view manages them together.",
-      "registerLink": "Register here",
-      "registerNow": "Register now",
-      "dashboardLink": "Dashboard",
-      "emptyRegisterHint": "No configuration yet.",
-      "apiKeyHint": "This key is only written to the selected group/protocol config.",
-      "usageCheck": "Check usage",
-      "usageChecking": "Checking",
-      "usageRemaining": "Remaining: {{amount}} {{unit}}",
-      "usageBreakdown": "Used {{used}} / Limit {{limit}}",
-      "usageStatus": "Status: {{status}}",
-      "usageInvalid": "Invalid key",
-      "usageEmpty": "The endpoint returned no usage data.",
-      "usageApiKeyRequired": "API key is required",
-      "groupedKeysTitle": "Grouped keys",
-      "groupedKeysHint": "APIKEY.FUN keys are bound to a platform group when created. Each grouped key here manages one protocol, and model discovery only uses that protocol.",
-      "groupedKey": "Grouped key #{{index}}",
-      "addGroupedKey": "Add grouped key",
-      "removeGroupedKey": "Remove grouped key",
-      "protocol": "Group/protocol",
-      "protocolHint": "Select the APIKEY.FUN platform group bound to this key.",
-      "protocolEndpoint": "Current protocol endpoint",
-      "urlMode": "APIKEY.FUN URL",
-      "urlHint": "Both URLs use the same API conventions. Saving writes only the endpoint for the current grouped protocol.",
-      "urlOptions": {
-        "standard": "Standard URL",
-        "direct": "Direct URL"
-      },
-      "modelsTitle": "Protocol model settings",
-      "modelsHint": "Configure model allowlists or aliases separately for APIKEY.FUN's Codex API, Anthropic, and OpenAI-compatible routes.",
-      "protocolModels": {
-        "codex": "Codex API models",
-        "anthropic": "Anthropic models",
-        "openai": "OpenAI-compatible models"
-      },
-      "protocolModelHints": {
-        "codex": "Writes to the Codex API config models. Fetch from /v1/models and set aliases if needed.",
-        "anthropic": "Writes to the Anthropic config models. Fetch from /v1/models and set aliases if needed.",
-        "openai": "Writes to the OpenAI-compatible config models. Fetch from /models and set aliases if needed."
-      },
-      "validation": {
-        "keyRequired": "Enter an API key for every grouped key.",
-        "protocolDuplicate": "Each protocol can only have one grouped key."
-      },
-      "openaiEntries": "OpenAI-compatible keys",
-      "codexEntries": "Codex API keys",
-      "anthropicEntries": "Anthropic keys",
-      "protocols": {
-        "anthropic": "Anthropic",
-        "openai": "OpenAI Compatible",
-        "codexResponses": "Codex API (Responses)"
-      }
     },
     "ampcode": {
       "detailHint": "Configure Amp CLI upstream routing, client key mappings, and model remaps.",

@@ -334,11 +334,6 @@ export function SystemPage() {
               <div className={styles.tileValue}>{buildTime}</div>
             </div>
 
-            <div className={styles.infoTile}>
-              <div className={styles.tileLabel}>{t('connection.status')}</div>
-              <div className={styles.tileValue}>{t(`common.${auth.connectionStatus}_status`)}</div>
-              <div className={styles.tileSub}>{auth.apiBase || '-'}</div>
-            </div>
           </div>
         </Card>
 
