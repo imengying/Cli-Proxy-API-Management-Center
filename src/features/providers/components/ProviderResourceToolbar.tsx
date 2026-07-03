@@ -140,6 +140,8 @@ export function ProviderResourceToolbar({
                     <SelectionCheckbox
                       checked={selectedModels.has(name)}
                       onChange={() => toggleModel(name)}
+                      className={styles.filterCheckbox}
+                      labelClassName={styles.filterCheckboxLabel}
                       label={<span className={styles.filterItemLabel}>{name}</span>}
                     />
                   </li>
