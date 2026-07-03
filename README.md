@@ -4,9 +4,8 @@
 
 [English](README_EN.md)
 
-**主项目**: https://github.com/router-for-me/CLIProxyAPI  
-**WebUI 仓库**: https://github.com/imengying/Cli-Proxy-API-Management-Center  
-**示例地址**: https://remote.router-for.me/  
+**主项目**: https://github.com/router-for-me/CLIProxyAPI<br>
+**原版WebUI 仓库**: https://github.com/router-for-me/Cli-Proxy-API-Management-Center<br>
 **支持版本**: CLIProxyAPI 7.2.49
 
 服务运行后，通过 API 端口上的 `/management.html` 访问 Web UI。
