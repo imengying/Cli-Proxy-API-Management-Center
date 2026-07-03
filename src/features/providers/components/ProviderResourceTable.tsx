@@ -6,6 +6,7 @@ import {
   IconPencil,
   IconTrash2,
 } from '@/components/ui/icons';
+import { ProviderStatusBar } from '@/components/providers/ProviderStatusBar';
 import {
   Table,
   TableBody,
@@ -17,15 +18,19 @@ import {
 import { ToggleSwitch } from '@/components/ui/ToggleSwitch';
 import {
   getOpenAIProviderLatestSuccessTime,
+  getOpenAIProviderRecentStatusData,
   getOpenAIProviderTotalStats,
   getProviderLatestSuccessTime,
+  getProviderRecentStatusData,
   getProviderTotalStats,
   type ProviderRecentUsageMap,
 } from '@/components/providers/utils';
 import type { OpenAIProviderConfig } from '@/types';
+import type { StatusBarData } from '@/utils/recentRequests';
 import { parseTimestampMs } from '@/utils/timestamp';
 import type { ProviderResource } from '../types';
 import styles from './ProviderResourceTable.module.scss';
+import statusBarStyles from './providerStatusBar.module.scss';
 
 interface ProviderResourceTableProps {
   resources: ProviderResource[];
@@ -38,7 +43,7 @@ interface ProviderResourceTableProps {
   onToggleDisabled?: (resource: ProviderResource, disabled: boolean) => void;
 }
 
-const columnWidths = ['146px', '216px', '92px', '132px', '260px', '82px', '132px'];
+const columnWidths = ['112px', '240px', '56px', '132px', '330px', '72px', '118px'];
 
 const formatRecentSuccessTime = (value: string | null): string => {
   if (!value) return '—';
@@ -85,6 +90,21 @@ const resolveLatestSuccessTime = (
   );
 };
 
+const resolveStatusBarData = (
+  resource: ProviderResource,
+  usageByProvider: ProviderRecentUsageMap
+): StatusBarData => {
+  if (resource.brand === 'openaiCompatibility') {
+    return getOpenAIProviderRecentStatusData(resource.raw as OpenAIProviderConfig, usageByProvider);
+  }
+  return getProviderRecentStatusData(
+    usageByProvider,
+    resource.brand,
+    resource.apiKey ?? undefined,
+    resource.baseUrl ?? undefined
+  );
+};
+
 export function ProviderResourceTable({
   resources,
   selectedId,
@@ -97,27 +117,9 @@ export function ProviderResourceTable({
 }: ProviderResourceTableProps) {
   const { t } = useTranslation();
 
-  const renderMetric = (label: string, value: number) => (
-    <span className={styles.metric}>
-      <span className={styles.metricLabel}>{label}</span>
-      <span className={styles.metricValue}>{value}</span>
-    </span>
+  const renderModelsSummary = (r: ProviderResource) => (
+    <span className={styles.modelCount}>{r.modelCount}</span>
   );
-
-  const renderModelsSummary = (r: ProviderResource) => {
-    if (r.brand === 'ampcode') {
-      return (
-        <div className={styles.metricsCell}>
-          {renderMetric(t('providersPage.table.metrics.models'), r.modelCount)}
-        </div>
-      );
-    }
-    return (
-      <div className={styles.metricsCell}>
-        {renderMetric(t('providersPage.table.metrics.models'), r.modelCount)}
-      </div>
-    );
-  };
 
   const renderStatus = (r: ProviderResource) => {
     if (r.disabled) {
@@ -194,14 +196,24 @@ export function ProviderResourceTable({
         : { success: 0, failure: 0 };
 
     return (
-      <div className={styles.statusSummary}>
-        {renderStatus(resource)}
-        <span className={`${styles.statPill} ${styles.statSuccess}`}>
-          {t('stats.success')}: {stats.success}
-        </span>
-        <span className={`${styles.statPill} ${styles.statFailure}`}>
-          {t('stats.failure')}: {stats.failure}
-        </span>
+      <div className={styles.statusCell}>
+        <div className={styles.statusSummary}>
+          {renderStatus(resource)}
+          <span className={`${styles.statPill} ${styles.statSuccess}`}>
+            {t('stats.success')}: {stats.success}
+          </span>
+          <span className={`${styles.statPill} ${styles.statFailure}`}>
+            {t('stats.failure')}: {stats.failure}
+          </span>
+        </div>
+        {usageByProvider && resource.brand !== 'ampcode' ? (
+          <div className={styles.statusBarWrap}>
+            <ProviderStatusBar
+              statusData={resolveStatusBarData(resource, usageByProvider)}
+              styles={statusBarStyles}
+            />
+          </div>
+        ) : null}
       </div>
     );
   };
@@ -247,10 +259,8 @@ export function ProviderResourceTable({
           <TableHead>{t('providersPage.table.models')}</TableHead>
           <TableHead>{t('providersPage.table.recentSuccess')}</TableHead>
           <TableHead>{t('providersPage.table.status')}</TableHead>
-          <TableHead>{t('providersPage.table.enabled')}</TableHead>
-          <TableHead alignRight className={styles.actionsHead}>
-            {t('providersPage.table.actions')}
-          </TableHead>
+          <TableHead className={styles.enabledHead}>{t('providersPage.table.enabled')}</TableHead>
+          <TableHead className={styles.actionsHead}>{t('providersPage.table.actions')}</TableHead>
         </TableRow>
       </TableHeader>
       <TableBody>
@@ -262,9 +272,8 @@ export function ProviderResourceTable({
               <TableCell>{renderModelsSummary(resource)}</TableCell>
               <TableCell>{renderRecentSuccess(resource)}</TableCell>
               <TableCell>{renderStatusSummary(resource)}</TableCell>
-              <TableCell>{renderEnabled(resource)}</TableCell>
+              <TableCell className={styles.enabledCell}>{renderEnabled(resource)}</TableCell>
               <TableCell
-                alignRight
                 className={[
                   styles.actionsCell,
                   resource.id === selectedId ? styles.actionsCellSelected : '',

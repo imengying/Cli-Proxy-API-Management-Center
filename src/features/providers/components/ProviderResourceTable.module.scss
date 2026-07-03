@@ -18,61 +18,49 @@
 }
 
 .primaryName {
+  display: block;
   font-weight: 600;
   color: var(--text-primary);
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
-  max-width: 142px;
+  max-width: 100%;
 }
 
 .primarySub {
+  display: block;
   font-size: 12px;
   color: var(--muted-foreground);
   font-family: $font-mono;
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
-  max-width: 142px;
+  max-width: 100%;
 }
 
 .baseUrl {
+  display: block;
   font-family: $font-mono;
   font-size: 12px;
   color: var(--muted-foreground);
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
-  max-width: 212px;
+  max-width: 100%;
 }
 
-.metricsCell {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 6px;
-  align-items: center;
-}
-
-.metric {
+.modelCount {
   display: inline-flex;
   align-items: center;
-  gap: 4px;
-  padding: 3px 9px;
+  justify-content: flex-start;
+  min-width: 2ch;
+  padding: 3px 0;
   border-radius: 6px;
-  border: 1px solid var(--border);
-  background: var(--muted);
-  font-size: 12px;
+  color: var(--text-primary);
+  font-size: 13px;
+  font-weight: 650;
   line-height: 1.4;
   white-space: nowrap;
-}
-
-.metricLabel {
-  color: var(--muted-foreground);
-}
-
-.metricValue {
-  color: var(--text-primary);
-  font-weight: 600;
   font-variant-numeric: tabular-nums;
 }
 
@@ -106,6 +94,14 @@
   color: var(--muted-foreground);
 }
 
+.statusCell {
+  display: flex;
+  flex-direction: column;
+  gap: 7px;
+  min-width: 0;
+  max-width: 100%;
+}
+
 .statusSummary {
   display: flex;
   align-items: center;
@@ -118,6 +114,11 @@
   .statPill {
     flex: 0 0 auto;
   }
+}
+
+.statusBarWrap {
+  width: min(100%, 300px);
+  min-width: 0;
 }
 
 .statPill {
@@ -177,23 +178,25 @@
   color: var(--text-secondary);
 }
 
+.enabledHead,
+.enabledCell {
+  padding-left: 8px;
+  padding-right: 8px;
+}
+
 .actionsHead,
 .actionsCell {
-  position: sticky;
-  right: 0;
-  width: 132px;
-  min-width: 132px;
-  box-shadow: -1px 0 0 var(--border);
+  width: 118px;
+  min-width: 118px;
+  padding-left: 6px;
 }
 
 .actionsHead {
-  z-index: 3;
-  background: var(--muted);
+  text-align: center;
 }
 
 .actionsCell {
-  z-index: 2;
-  background: var(--card);
+  text-align: center;
 }
 
 .actionsCellSelected {
@@ -204,14 +207,15 @@
   display: flex;
   gap: 4px;
   align-items: center;
-  justify-content: flex-end;
+  justify-content: center;
   min-width: 0;
 }
 
 .toggleWrap {
-  display: inline-flex;
+  display: flex;
   align-items: center;
-  justify-content: center;
+  justify-content: flex-start;
+  width: 100%;
 }
 
 .iconBtn {

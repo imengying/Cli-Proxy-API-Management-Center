@@ -3,9 +3,11 @@ import {
   buildRecentRequestCompositeKey,
   mergeRecentRequestBucketGroups,
   normalizeRecentRequestBuckets,
+  statusBarDataFromRecentRequests,
   sumRecentRequests,
   type RecentRequestBucket,
   type RecentRequestUsageEntry,
+  type StatusBarData,
 } from '@/utils/recentRequests';
 import { parseTimestampMs } from '@/utils/timestamp';
 
@@ -187,6 +189,17 @@ export function getProviderLatestSuccessTime(
   );
 }
 
+export function getProviderRecentStatusData(
+  usageByProvider: ProviderRecentUsageMap,
+  provider: string,
+  apiKey?: string,
+  baseUrl?: string
+): StatusBarData {
+  return statusBarDataFromRecentRequests(
+    getProviderRecentBuckets(usageByProvider, provider, apiKey, baseUrl)
+  );
+}
+
 export function getProviderRecentWindowStats(
   usageByProvider: ProviderRecentUsageMap,
   provider: string,
@@ -236,6 +249,15 @@ export function getOpenAIProviderTotalStats(
       };
     },
     { success: 0, failure: 0 }
+  );
+}
+
+export function getOpenAIProviderRecentStatusData(
+  provider: OpenAIProviderConfig,
+  usageByProvider: ProviderRecentUsageMap
+): StatusBarData {
+  return statusBarDataFromRecentRequests(
+    collectOpenAIProviderRecentBuckets(provider, usageByProvider)
   );
 }
 

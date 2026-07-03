@@ -13,7 +13,9 @@ import {
 import { useAuthStore, useConfigStore, useModelsStore, useNotificationStore } from '@/stores';
 import { authFilesApi, versionApi } from '@/services/api';
 import { useApiKeysForModels } from '@/hooks/useApiKeysForModels';
+import type { Config } from '@/types';
 import { formatDateTimeValue } from '@/utils/format';
+import { isRecord } from '@/utils/helpers';
 import styles from './DashboardPage.module.scss';
 
 interface QuickStat {
@@ -59,6 +61,26 @@ const compareVersions = (latest?: string | null, current?: string | null) => {
     if (l < c) return -1;
   }
   return 0;
+};
+
+const pickVersionString = (...values: unknown[]): string => {
+  for (const value of values) {
+    if (typeof value === 'string' && value.trim()) {
+      return value.trim();
+    }
+    if (typeof value === 'number' && Number.isFinite(value)) {
+      return String(value);
+    }
+  }
+  return '';
+};
+
+const getPanelRepositoryFromConfig = (config?: Config | null): string => {
+  const remoteManagement = isRecord(config?.raw?.['remote-management'])
+    ? config.raw['remote-management']
+    : null;
+  const repository = remoteManagement?.['panel-github-repository'];
+  return typeof repository === 'string' ? repository.trim() : '';
 };
 
 export function DashboardPage() {
@@ -110,12 +132,14 @@ export function DashboardPage() {
   }, [connectionStatus, apiBase, resolveApiKeysForModels, fetchModelsFromStore]);
 
   const runVersionCheck = useCallback(
-    async (currentVersion: string | null | undefined, setChecking: (checking: boolean) => void) => {
+    async (
+      currentVersion: string | null | undefined,
+      setChecking: (checking: boolean) => void,
+      loadLatestVersion: () => Promise<string>
+    ) => {
       setChecking(true);
       try {
-        const data = await versionApi.checkLatest();
-        const latestRaw = data?.['latest-version'] ?? data?.latest_version ?? data?.latest ?? '';
-        const latest = typeof latestRaw === 'string' ? latestRaw : String(latestRaw ?? '');
+        const latest = await loadLatestVersion();
         const comparison = compareVersions(latest, currentVersion);
 
         if (!latest) {
@@ -149,12 +173,26 @@ export function DashboardPage() {
   );
 
   const handleAppVersionCheck = useCallback(
-    () => runVersionCheck(appVersionRaw, setCheckingAppVersion),
-    [appVersionRaw, runVersionCheck]
+    () =>
+      runVersionCheck(appVersionRaw, setCheckingAppVersion, async () => {
+        let panelRepository = getPanelRepositoryFromConfig(config);
+        if (!panelRepository) {
+          const latestConfig = await fetchConfig().catch(() => null);
+          panelRepository = getPanelRepositoryFromConfig(latestConfig);
+        }
+
+        const data = await versionApi.checkLatestApp(panelRepository);
+        return pickVersionString(data.latest);
+      }),
+    [appVersionRaw, config, fetchConfig, runVersionCheck]
   );
 
   const handleApiVersionCheck = useCallback(
-    () => runVersionCheck(serverVersion, setCheckingApiVersion),
+    () =>
+      runVersionCheck(serverVersion, setCheckingApiVersion, async () => {
+        const data = await versionApi.checkLatest();
+        return pickVersionString(data['latest-version'], data.latest_version, data.latest);
+      }),
     [runVersionCheck, serverVersion]
   );
 
@@ -374,7 +412,6 @@ export function DashboardPage() {
           <div className={styles.sectionHeader}>
             <div>
               <h2>{t('dashboard.current_config')}</h2>
-              <p>{t('dashboard.edit_settings')}</p>
             </div>
           </div>
           <div className={styles.configGrid}>
