@@ -1,12 +1,13 @@
 @use './variables.scss' as *;
 
 :root {
-  --header-height: 64px;
+  --navbar-height: 50px;
+  --header-height: var(--navbar-height);
   --shell-gutter: 24px;
-  --sidebar-panel-width: 252px;
+  --sidebar-panel-width: 210px;
   --sidebar-active-width: var(--sidebar-panel-width);
   --sidebar-gap: 0px;
-  --floating-control-size: 36px;
+  --floating-control-size: 34px;
 }
 
 .app-shell {
@@ -43,7 +44,7 @@
   position: fixed;
   top: 0;
   right: 0;
-  left: 0;
+  left: var(--sidebar-active-width);
   z-index: $z-dropdown + 1;
   height: var(--header-height);
   display: flex;
@@ -53,45 +54,13 @@
   border-bottom: 1px solid var(--border);
   box-shadow: none;
 
-  .header-brand {
-    width: var(--sidebar-active-width);
-    min-width: var(--sidebar-active-width);
-    padding: 0 14px;
-    display: flex;
-    align-items: center;
-    gap: 12px;
-    overflow: hidden;
-    border-right: 1px solid var(--border);
-    color: var(--foreground);
-    transition: width $transition-normal, min-width $transition-normal, padding $transition-normal;
-  }
-
-  .header-brand-logo {
-    width: 36px;
-    height: 36px;
-    border-radius: 9px;
-    object-fit: contain;
-    flex-shrink: 0;
-  }
-
-  .header-brand-title {
-    min-width: 0;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    white-space: nowrap;
-    font-size: 18px;
-    font-weight: 800;
-    letter-spacing: 0;
-    color: var(--foreground);
-  }
-
   .header-main {
     min-width: 0;
     flex: 1 1 auto;
     display: flex;
     align-items: center;
-    gap: 18px;
-    padding: 0 20px;
+    gap: 14px;
+    padding: 0 16px;
   }
 
   .header-current-page {
@@ -114,10 +83,10 @@
   .header-actions {
     height: 100%;
     margin-left: auto;
-    padding: 0 24px 0 12px;
+    padding: 0 16px 0 8px;
     display: inline-flex;
     align-items: center;
-    gap: 14px;
+    gap: 8px;
     border: 0;
     background: transparent;
     color: var(--text-secondary);
@@ -317,17 +286,15 @@
 
 .main-body {
   position: relative;
-  display: flex;
-  flex: 1;
-  gap: 0;
-  min-height: 0;
-  height: calc(100vh - var(--header-height));
-  margin-top: var(--header-height);
+  display: block;
+  min-height: 100vh;
+  height: 100vh;
+  margin-top: 0;
   padding: 0;
   overflow: hidden;
 
   @supports (height: 100dvh) {
-    height: calc(100dvh - var(--header-height));
+    height: 100dvh;
   }
 }
 
@@ -345,16 +312,18 @@
 }
 
 .sidebar {
-  position: relative;
+  position: fixed;
+  top: 0;
+  bottom: 0;
+  left: 0;
   z-index: $z-dropdown - 1;
   width: var(--sidebar-panel-width);
-  height: calc(100vh - var(--header-height));
-  padding: 14px;
+  height: 100vh;
+  padding: 0;
   display: flex;
   flex-direction: column;
-  gap: $spacing-md;
   flex-shrink: 0;
-  overflow-y: auto;
+  overflow: hidden;
   background: var(--sidebar-background, var(--card));
   border: 0;
   border-right: 1px solid var(--border);
@@ -363,15 +332,58 @@
   scrollbar-width: none;
   transition:
     width $transition-normal,
-    transform $transition-normal,
-    padding $transition-normal;
+    transform $transition-normal;
 
   @supports (height: 100dvh) {
-    height: calc(100dvh - var(--header-height));
+    height: 100dvh;
   }
 
   &::-webkit-scrollbar {
     display: none;
+  }
+
+  .sidebar-brand {
+    height: var(--navbar-height);
+    min-height: var(--navbar-height);
+    padding: 0 18px;
+    display: flex;
+    align-items: center;
+    justify-content: flex-start;
+    gap: 10px;
+    overflow: hidden;
+    background: var(--card);
+    border-bottom: 1px solid var(--border);
+    color: var(--foreground);
+  }
+
+  .sidebar-brand-logo-wrap {
+    width: 30px;
+    height: 30px;
+    border-radius: 7px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    overflow: hidden;
+  }
+
+  .sidebar-brand-logo {
+    width: 30px;
+    height: 30px;
+    border-radius: 7px;
+    object-fit: cover;
+    flex-shrink: 0;
+  }
+
+  .sidebar-brand-title {
+    min-width: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    font-size: 15px;
+    font-weight: 700;
+    letter-spacing: 0;
+    color: var(--foreground);
   }
 
   .nav-section {
@@ -379,6 +391,10 @@
     flex-direction: column;
     gap: 14px;
     flex: 1;
+    min-height: 0;
+    padding: 12px;
+    overflow-y: auto;
+    scrollbar-width: none;
   }
 
   .nav-group {
@@ -565,16 +581,18 @@
 }
 
 .content {
-  flex: 1;
+  position: relative;
   display: flex;
   flex-direction: column;
   min-width: 0;
-  height: calc(100vh - var(--header-height));
+  margin-left: var(--sidebar-active-width);
+  height: 100vh;
   overflow-y: auto;
   scrollbar-gutter: stable;
+  transition: margin-left $transition-normal;
 
   @supports (height: 100dvh) {
-    height: calc(100dvh - var(--header-height));
+    height: 100dvh;
   }
 
   &.content-logs {
@@ -592,7 +610,7 @@
   z-index: 2;
   flex: 1 0 auto;
   min-height: 100%;
-  padding: 18px clamp(14px, 2vw, 28px) 28px;
+  padding: calc(var(--header-height) + 14px) clamp(14px, 2vw, 28px) 28px;
   display: flex;
   flex-direction: column;
   gap: 14px;
@@ -607,7 +625,7 @@
   &.main-content-plugin-resource {
     flex: 1 1 auto;
     min-height: 0;
-    padding: 0;
+    padding: var(--header-height) 0 0;
     gap: 0;
     overflow: hidden;
     background: #ffffff;
@@ -634,29 +652,14 @@
 
 @media (max-width: $breakpoint-mobile) {
   :root {
-    --header-height: 60px;
     --shell-gutter: 12px;
     --sidebar-panel-width: min(280px, calc(100vw - 24px));
+    --sidebar-active-width: 0px;
     --floating-control-size: 34px;
   }
 
   .main-header {
-    .header-brand {
-      width: auto;
-      min-width: 130px;
-      padding: 0 10px 0 12px;
-      border-right: 0;
-      gap: 10px;
-    }
-
-    .header-brand-logo {
-      width: 34px;
-      height: 34px;
-    }
-
-    .header-brand-title {
-      font-size: 17px;
-    }
+    left: 0;
 
     .header-main {
       flex: 1 1 auto;
@@ -711,15 +714,14 @@
   }
 
   .main-body {
-    height: calc(100vh - var(--header-height));
-    min-height: calc(100vh - var(--header-height));
-    margin-top: var(--header-height);
+    height: auto;
+    min-height: 100vh;
+    margin-top: 0;
     padding: 0;
     overflow: visible;
 
     @supports (height: 100dvh) {
-      height: calc(100dvh - var(--header-height));
-      min-height: calc(100dvh - var(--header-height));
+      min-height: 100dvh;
     }
   }
 
@@ -757,12 +759,12 @@
     &.open {
       transform: translateX(0);
     }
-
   }
 
   .content {
+    margin-left: 0;
     height: auto;
-    min-height: calc(100vh - var(--header-height));
+    min-height: 100vh;
     overflow: visible;
     overflow-y: auto;
 
@@ -773,23 +775,23 @@
     }
 
     &.content-plugin-resource {
-      height: calc(100vh - var(--header-height));
-      min-height: calc(100vh - var(--header-height));
+      height: 100vh;
+      min-height: 100vh;
       overflow: hidden;
 
       @supports (height: 100dvh) {
-        height: calc(100dvh - var(--header-height));
-        min-height: calc(100dvh - var(--header-height));
+        height: 100dvh;
+        min-height: 100dvh;
       }
     }
   }
 
   .main-content {
-    padding: 14px 12px 20px;
+    padding: calc(var(--header-height) + 12px) 12px 20px;
 
     &.main-content-plugin-resource {
       min-height: 0;
-      padding: 0;
+      padding: var(--header-height) 0 0;
       overflow: hidden;
     }
 

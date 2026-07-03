@@ -584,8 +584,6 @@ export function OAuthPage() {
 
   return (
     <div className={styles.container}>
-      <h1 className={styles.pageTitle}>{t('nav.oauth', { defaultValue: 'OAuth' })}</h1>
-
       <div className={styles.content}>
         {providerCards.map((provider) => {
           const state = states[provider.id] || {};

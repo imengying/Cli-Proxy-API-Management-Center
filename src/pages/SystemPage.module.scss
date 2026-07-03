@@ -2,99 +2,10 @@
   width: 100%;
 }
 
-.pageTitle {
-  font-size: 24px;
-  font-weight: 650;
-  line-height: 1.15;
-  color: var(--foreground);
-  margin: 0 0 14px;
-}
-
 .content {
   display: flex;
   flex-direction: column;
   gap: 14px;
-}
-
-.aboutCard {
-  overflow: hidden;
-  border-color: var(--border);
-}
-
-.aboutInfoGrid {
-  display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
-  gap: $spacing-sm;
-
-  @media (max-width: 1100px) {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-  }
-
-  @media (max-width: 640px) {
-    grid-template-columns: 1fr;
-  }
-}
-
-.infoTile {
-  display: flex;
-  flex-direction: column;
-  gap: 6px;
-  min-height: 96px;
-  padding: $spacing-md;
-  border-radius: 8px;
-  border: 1px solid var(--border);
-  background: var(--background);
-  text-align: left;
-}
-
-.tapTile {
-  border: 1px solid var(--border);
-  background: var(--background);
-  color: inherit;
-  padding: $spacing-md $spacing-lg;
-  cursor: pointer;
-  transition:
-    background-color 0.18s ease,
-    border-color 0.2s ease,
-    box-shadow 0.2s ease;
-
-  &:hover {
-    background: var(--muted);
-    border-color: var(--border);
-    box-shadow: none;
-  }
-
-  &:active {
-    transform: none;
-  }
-}
-
-.tileLabel {
-  font-size: 13px;
-  font-weight: 600;
-  color: var(--muted-foreground);
-}
-
-.tileHeader {
-  display: flex;
-  align-items: flex-start;
-  justify-content: space-between;
-  gap: $spacing-sm;
-  min-height: 40px;
-}
-
-.tileAction {
-  flex-shrink: 0;
-  white-space: nowrap;
-  margin: -4px -8px 0 0;
-}
-
-.tileValue {
-  font-size: 20px;
-  font-weight: 750;
-  color: var(--foreground);
-  line-height: 1.25;
-  word-break: break-word;
 }
 
 .section {
@@ -314,12 +225,6 @@
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
-}
-
-@media (max-width: 768px) {
-  .aboutInfoGrid {
-    grid-template-columns: 1fr;
-  }
 }
 
 @media (max-width: 520px) {

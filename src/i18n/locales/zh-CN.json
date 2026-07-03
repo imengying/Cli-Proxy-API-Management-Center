@@ -137,8 +137,6 @@
     "system_info": "运行与诊断信息"
   },
   "dashboard": {
-    "title": "仪表盘",
-    "subtitle": "欢迎使用 CPA Manager",
     "openai_providers": "OpenAI 提供商",
     "quick_actions": "快捷操作",
     "current_config": "当前配置",
@@ -181,9 +179,6 @@
     "logs_max_total_size_label": "日志总大小上限 (MB):",
     "logs_max_total_size_hint": "设置为 0 表示不限制。",
     "logs_max_total_size_update": "更新",
-    "request_log_title": "请求日志",
-    "request_log_enable": "启用请求日志",
-    "request_log_warning": "仅在需要排查问题时开启，日常请保持关闭。",
     "force_model_prefix_enable": "强制模型前缀",
     "ws_auth_title": "WebSocket 鉴权",
     "ws_auth_enable": "启用 /ws/* 鉴权",
@@ -808,12 +803,10 @@
     "upgrade_required_desc": "当前服务器版本不支持日志查看功能，请升级到最新版本的 CLI Proxy API 以使用此功能。"
   },
   "config_management": {
-    "title": "配置面板",
     "editor_title": "配置文件",
     "reload": "重新加载",
     "reload_confirm_message": "重新加载将丢弃你当前未保存的修改，确定继续吗？",
     "save": "保存",
-    "description": "通过可视化或者源文件方式编辑 config.yaml 配置文件",
     "status_idle": "等待操作",
     "status_loading": "加载配置中...",
     "status_loading_short": "加载中",
@@ -1134,16 +1127,12 @@
     }
   },
   "quota_management": {
-    "title": "配额管理",
-    "description": "集中查看 OAuth 额度与剩余情况",
     "refresh_files": "刷新认证文件",
     "refresh_files_and_quota": "刷新认证文件&额度",
     "refresh_all_credentials": "刷新全部凭证",
     "card_idle_hint": "请使用顶部“刷新全部凭证”按钮获取最新额度。"
   },
   "plugin_management": {
-    "title": "插件管理",
-    "description": "查看已发现和已注册的插件，管理实例开关、配置字段和资源入口。",
     "refresh": "刷新",
     "load_failed": "加载插件失败",
     "config_load_failed": "读取插件配置失败",
@@ -1206,7 +1195,6 @@
   },
   "plugin_store": {
     "title": "插件商店",
-    "description": "浏览插件注册表,为当前后端安装或更新插件。",
     "description_show_more": "展开描述",
     "description_show_less": "收起描述",
     "source_name": "来源：{{source}}",
@@ -1293,8 +1281,6 @@
     "empty_src_desc": "该插件菜单未提供可嵌入的页面地址。"
   },
   "system_info": {
-    "title": "系统信息",
-    "about_title": "关于",
     "last_update_label": "最后更新:",
     "cache_data": "缓存数据",
     "real_time_data": "实时数据",
@@ -1340,7 +1326,6 @@
     "quota_switch_preview_updated": "预览模型切换设置已更新",
     "logging_to_file_updated": "日志记录设置已更新",
     "logs_max_total_size_updated": "日志容量设置已更新",
-    "request_log_updated": "请求日志设置已更新",
     "force_model_prefix_updated": "模型前缀设置已更新",
     "ws_auth_updated": "WebSocket 鉴权设置已更新",
     "routing_strategy_updated": "路由策略已更新",

@@ -14,31 +14,11 @@
   );
 }
 
-.pageHeader {
-  display: flex;
-  align-items: flex-start;
-}
-
-.pageHeaderCopy {
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
-  min-width: 0;
-  width: min(100%, 360px);
-}
-
-.pageTitle {
-  font-size: 24px;
-  font-weight: 650;
-  line-height: 1.15;
-  color: var(--foreground);
-  margin: 0;
-}
-
 .tabBar {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
   gap: 2px;
+  width: min(100%, 360px);
   padding: 2px;
   border: 1px solid var(--border);
   border-radius: 8px;
@@ -72,7 +52,8 @@
   }
 }
 
-.tabActive {
+.tabActive,
+.tabActive:hover:not(:disabled) {
   color: var(--background);
   background: var(--foreground);
   border-color: var(--foreground);

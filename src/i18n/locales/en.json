@@ -137,8 +137,6 @@
     "system_info": "Runtime & diagnostics"
   },
   "dashboard": {
-    "title": "Dashboard",
-    "subtitle": "Welcome to CPA Manager",
     "openai_providers": "OpenAI Providers",
     "quick_actions": "Quick Actions",
     "current_config": "Current Configuration",
@@ -181,9 +179,6 @@
     "logs_max_total_size_label": "Total log size cap (MB):",
     "logs_max_total_size_hint": "Set to 0 to disable the limit.",
     "logs_max_total_size_update": "Update",
-    "request_log_title": "Request Logging",
-    "request_log_enable": "Enable request logging",
-    "request_log_warning": "Keep this off unless you need detailed troubleshooting.",
     "force_model_prefix_enable": "Force model prefix",
     "ws_auth_title": "WebSocket Authentication",
     "ws_auth_enable": "Require auth for /ws/*",
@@ -808,12 +803,10 @@
     "upgrade_required_desc": "The current server version does not support the logs viewing feature. Please upgrade to the latest version of CLI Proxy API to use this feature."
   },
   "config_management": {
-    "title": "Config Panel",
     "editor_title": "Configuration File",
     "reload": "Reload",
     "reload_confirm_message": "Reloading will discard your unsaved changes. Do you want to continue?",
     "save": "Save",
-    "description": "Edit config.yaml via visual editor or source file",
     "status_idle": "Waiting for action",
     "status_loading": "Loading configuration...",
     "status_loading_short": "Loading",
@@ -1134,16 +1127,12 @@
     }
   },
   "quota_management": {
-    "title": "Quota Management",
-    "description": "Monitor OAuth quota status for Antigravity, Codex, Claude, Kimi, and xAI credentials.",
     "refresh_files": "Refresh auth files",
     "refresh_files_and_quota": "Refresh files & quota",
     "refresh_all_credentials": "Refresh all credentials",
     "card_idle_hint": "Use the top \"Refresh all credentials\" button to fetch the latest quota data."
   },
   "plugin_management": {
-    "title": "Plugin Management",
-    "description": "Review discovered and registered plugins, then manage instance toggles, config fields, and resource links.",
     "refresh": "Refresh",
     "load_failed": "Failed to load plugins",
     "config_load_failed": "Failed to read plugin config",
@@ -1206,7 +1195,6 @@
   },
   "plugin_store": {
     "title": "Plugin Store",
-    "description": "Browse the plugin registry, then install or update plugins for the current backend.",
     "description_show_more": "Show more",
     "description_show_less": "Show less",
     "source_name": "Source: {{source}}",
@@ -1293,8 +1281,6 @@
     "empty_src_desc": "This plugin menu does not provide an embeddable page URL."
   },
   "system_info": {
-    "title": "System Info",
-    "about_title": "About",
     "last_update_label": "Last Update:",
     "cache_data": "Cache Data",
     "real_time_data": "Real-time Data",
@@ -1340,7 +1326,6 @@
     "quota_switch_preview_updated": "Preview model switch settings updated",
     "logging_to_file_updated": "Logging settings updated",
     "logs_max_total_size_updated": "Log size limit updated",
-    "request_log_updated": "Request logging setting updated",
     "force_model_prefix_updated": "Model prefix setting updated",
     "ws_auth_updated": "WebSocket authentication setting updated",
     "routing_strategy_updated": "Routing strategy updated",

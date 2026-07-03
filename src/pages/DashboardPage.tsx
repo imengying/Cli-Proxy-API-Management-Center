@@ -1,6 +1,8 @@
 import { useCallback, useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
+import { Card } from '@/components/ui/Card';
+import { Button } from '@/components/ui/Button';
 import {
   IconKey,
   IconBot,
@@ -8,9 +10,10 @@ import {
   IconSatellite,
   IconSidebarQuota,
 } from '@/components/ui/icons';
-import { useAuthStore, useConfigStore, useModelsStore } from '@/stores';
-import { authFilesApi } from '@/services/api';
+import { useAuthStore, useConfigStore, useModelsStore, useNotificationStore } from '@/stores';
+import { authFilesApi, versionApi } from '@/services/api';
 import { useApiKeysForModels } from '@/hooks/useApiKeysForModels';
+import { formatDateTimeValue } from '@/utils/format';
 import styles from './DashboardPage.module.scss';
 
 interface QuickStat {
@@ -32,10 +35,39 @@ function getTimeOfDay(): TimeOfDay {
   return 'night';
 }
 
+const parseVersionSegments = (version?: string | null) => {
+  if (!version) return null;
+  const cleaned = version.trim().replace(/^v/i, '');
+  if (!cleaned) return null;
+  const parts = cleaned
+    .split(/[^0-9]+/)
+    .filter(Boolean)
+    .map((segment) => Number.parseInt(segment, 10))
+    .filter(Number.isFinite);
+  return parts.length ? parts : null;
+};
+
+const compareVersions = (latest?: string | null, current?: string | null) => {
+  const latestParts = parseVersionSegments(latest);
+  const currentParts = parseVersionSegments(current);
+  if (!latestParts || !currentParts) return null;
+  const length = Math.max(latestParts.length, currentParts.length);
+  for (let i = 0; i < length; i++) {
+    const l = latestParts[i] || 0;
+    const c = currentParts[i] || 0;
+    if (l > c) return 1;
+    if (l < c) return -1;
+  }
+  return 0;
+};
+
 export function DashboardPage() {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
+  const { showNotification } = useNotificationStore();
   const connectionStatus = useAuthStore((state) => state.connectionStatus);
   const apiBase = useAuthStore((state) => state.apiBase);
+  const serverVersion = useAuthStore((state) => state.serverVersion);
+  const serverBuildDate = useAuthStore((state) => state.serverBuildDate);
   const config = useConfigStore((state) => state.config);
   const fetchConfig = useConfigStore((state) => state.fetchConfig);
 
@@ -45,11 +77,10 @@ export function DashboardPage() {
 
   const [authFilesCount, setAuthFilesCount] = useState<number | null>(null);
   const [authFilesLoading, setAuthFilesLoading] = useState(false);
-
-  // Time-of-day state for dynamic greeting
   const [timeOfDay, setTimeOfDay] = useState<TimeOfDay>(getTimeOfDay);
+  const [checkingAppVersion, setCheckingAppVersion] = useState(false);
+  const [checkingApiVersion, setCheckingApiVersion] = useState(false);
 
-  // Update greeting bucket every 60 seconds.
   useEffect(() => {
     const id = setInterval(() => {
       setTimeOfDay(getTimeOfDay());
@@ -58,6 +89,11 @@ export function DashboardPage() {
   }, []);
 
   const resolveApiKeysForModels = useApiKeysForModels();
+  const appVersionRaw = __APP_VERSION__ || '';
+  const appVersion = appVersionRaw || t('system_info.version_unknown');
+  const apiVersion = serverVersion || t('system_info.version_unknown');
+  const buildTime =
+    formatDateTimeValue(serverBuildDate, i18n.language) || t('system_info.version_unknown');
 
   const fetchModels = useCallback(async () => {
     if (connectionStatus !== 'connected' || !apiBase) {
@@ -72,6 +108,55 @@ export function DashboardPage() {
       // Ignore model fetch errors on dashboard
     }
   }, [connectionStatus, apiBase, resolveApiKeysForModels, fetchModelsFromStore]);
+
+  const runVersionCheck = useCallback(
+    async (currentVersion: string | null | undefined, setChecking: (checking: boolean) => void) => {
+      setChecking(true);
+      try {
+        const data = await versionApi.checkLatest();
+        const latestRaw = data?.['latest-version'] ?? data?.latest_version ?? data?.latest ?? '';
+        const latest = typeof latestRaw === 'string' ? latestRaw : String(latestRaw ?? '');
+        const comparison = compareVersions(latest, currentVersion);
+
+        if (!latest) {
+          showNotification(t('system_info.version_check_error'), 'error');
+          return;
+        }
+
+        if (comparison === null) {
+          showNotification(t('system_info.version_current_missing'), 'warning');
+          return;
+        }
+
+        if (comparison > 0) {
+          showNotification(
+            t('system_info.version_update_available', { version: latest }),
+            'warning'
+          );
+        } else {
+          showNotification(t('system_info.version_is_latest'), 'success');
+        }
+      } catch (error: unknown) {
+        const message =
+          error instanceof Error ? error.message : typeof error === 'string' ? error : '';
+        const suffix = message ? `: ${message}` : '';
+        showNotification(`${t('system_info.version_check_error')}${suffix}`, 'error');
+      } finally {
+        setChecking(false);
+      }
+    },
+    [showNotification, t]
+  );
+
+  const handleAppVersionCheck = useCallback(
+    () => runVersionCheck(appVersionRaw, setCheckingAppVersion),
+    [appVersionRaw, runVersionCheck]
+  );
+
+  const handleApiVersionCheck = useCallback(
+    () => runVersionCheck(serverVersion, setCheckingApiVersion),
+    [runVersionCheck, serverVersion]
+  );
 
   useEffect(() => {
     if (connectionStatus !== 'connected') {
@@ -181,8 +266,6 @@ export function DashboardPage() {
       : routingStrategyRaw === 'fill-first'
         ? styles.configBadgeFillFirst
         : styles.configBadgeUnknown;
-
-  // Derived time-based values
   const greetingKey = `dashboard.greeting_${timeOfDay}`;
   const caringKey = `dashboard.caring_${timeOfDay}`;
   const connectionStatusLabel = t(`common.${connectionStatus}_status`);
@@ -217,20 +300,57 @@ export function DashboardPage() {
         </div>
       </section>
 
-      <section className={styles.section}>
-        <div className={styles.sectionHeader}>
-          <div>
-            <h2>{t('dashboard.system_overview')}</h2>
-            <p>{apiBase}</p>
+      <Card className={styles.aboutCard} title={t('dashboard.system_overview')}>
+        <div className={styles.aboutInfoGrid}>
+          <div className={styles.infoTile}>
+            <div className={styles.tileHeader}>
+              <div className={styles.tileLabel}>{t('footer.version')}</div>
+              <Button
+                type="button"
+                variant="ghost"
+                size="sm"
+                className={styles.tileAction}
+                onClick={() => void handleAppVersionCheck()}
+                loading={checkingAppVersion}
+                title={t('system_info.version_check_button')}
+                aria-label={t('system_info.version_check_button')}
+              >
+                {t('system_info.version_check_button')}
+              </Button>
+            </div>
+            <div className={styles.tileValue}>{appVersion}</div>
+          </div>
+
+          <div className={styles.infoTile}>
+            <div className={styles.tileHeader}>
+              <div className={styles.tileLabel}>{t('footer.api_version')}</div>
+              <Button
+                type="button"
+                variant="ghost"
+                size="sm"
+                className={styles.tileAction}
+                onClick={() => void handleApiVersionCheck()}
+                loading={checkingApiVersion}
+                title={t('system_info.version_check_button')}
+                aria-label={t('system_info.version_check_button')}
+              >
+                {t('system_info.version_check_button')}
+              </Button>
+            </div>
+            <div className={styles.tileValue}>{apiVersion}</div>
+          </div>
+
+          <div className={styles.infoTile}>
+            <div className={styles.tileLabel}>{t('footer.build_date')}</div>
+            <div className={styles.tileValue}>{buildTime}</div>
           </div>
         </div>
+      </Card>
+
+      <section className={styles.section}>
         <div className={styles.statsGrid}>
           {quickStats.map((stat) => (
-            <Link
-              key={stat.path}
-              to={stat.path}
-              className={styles.statCard}
-            >
+            <Link key={stat.path} to={stat.path} className={styles.statCard}>
               <div className={styles.statTop}>
                 <span className={styles.statIcon}>{stat.icon}</span>
                 <span className={styles.statArrow} aria-hidden="true">

@@ -54,11 +54,6 @@ export const configApi = {
     apiClient.put('/quota-exceeded/switch-preview-model', { value: enabled }),
 
   /**
-   * 请求日志开关
-   */
-  updateRequestLog: (enabled: boolean) => apiClient.put('/request-log', { value: enabled }),
-
-  /**
    * 写日志到文件开关
    */
   updateLoggingToFile: (enabled: boolean) => apiClient.put('/logging-to-file', { value: enabled }),

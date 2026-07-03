@@ -7,27 +7,6 @@
   gap: 14px;
 }
 
-.pageHeader {
-  display: flex;
-  flex-direction: column;
-  gap: $spacing-sm;
-}
-
-.pageTitle {
-  font-size: 24px;
-  font-weight: 650;
-  line-height: 1.15;
-  color: var(--foreground);
-  margin: 0;
-}
-
-.description {
-  font-size: 13px;
-  line-height: 1.5;
-  color: var(--muted-foreground);
-  margin: 0;
-}
-
 .headerActions {
   display: flex;
   gap: $spacing-sm;

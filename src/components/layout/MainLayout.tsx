@@ -750,11 +750,6 @@ export function MainLayout() {
       <div className="top-gradient-blur" aria-hidden="true" />
 
       <header className="main-header" ref={headerRef}>
-        <div className="header-brand" title="CPAMC">
-          <img src={INLINE_LOGO_JPEG} alt="CPAMC logo" className="header-brand-logo" />
-          <span className="header-brand-title">CPAMC</span>
-        </div>
-
         <div className="header-main">
           <Button
             className="header-menu-btn"
@@ -899,6 +894,13 @@ export function MainLayout() {
         />
 
         <aside className={`sidebar ${sidebarOpen ? 'open' : ''}`}>
+          <div className="sidebar-brand" title="CPAMC">
+            <span className="sidebar-brand-logo-wrap" aria-hidden="true">
+              <img src={INLINE_LOGO_JPEG} alt="" className="sidebar-brand-logo" />
+            </span>
+            <span className="sidebar-brand-title">CPAMC</span>
+          </div>
+
           <div className="nav-section">
             {navGroups.map((group) => (
               <div
