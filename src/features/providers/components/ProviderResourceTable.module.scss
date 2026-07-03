@@ -5,6 +5,10 @@
   min-width: 1060px;
   table-layout: fixed;
 
+  tbody td:not(.statusColumn) {
+    vertical-align: middle;
+  }
+
   tbody tr:hover .actionsCell {
     background: var(--accent);
   }

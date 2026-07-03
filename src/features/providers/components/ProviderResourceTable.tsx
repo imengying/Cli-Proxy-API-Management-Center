@@ -271,7 +271,7 @@ export function ProviderResourceTable({
               <TableCell>{renderBaseUrl(resource)}</TableCell>
               <TableCell>{renderModelsSummary(resource)}</TableCell>
               <TableCell>{renderRecentSuccess(resource)}</TableCell>
-              <TableCell>{renderStatusSummary(resource)}</TableCell>
+              <TableCell className={styles.statusColumn}>{renderStatusSummary(resource)}</TableCell>
               <TableCell className={styles.enabledCell}>{renderEnabled(resource)}</TableCell>
               <TableCell
                 className={[
