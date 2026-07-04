@@ -15,7 +15,7 @@
 
 .tabBar {
   display: inline-flex;
-  gap: 2px;
+  gap: $spacing-sm;
   width: fit-content;
   max-width: 100%;
   margin-bottom: 14px;

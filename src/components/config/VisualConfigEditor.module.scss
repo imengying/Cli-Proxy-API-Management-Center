@@ -177,7 +177,7 @@
 
 .modeSwitch {
   display: inline-flex;
-  gap: 4px;
+  gap: $spacing-sm;
   padding: 3px;
   border: 1px solid var(--border-color);
   border-radius: 8px;

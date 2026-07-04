@@ -627,26 +627,7 @@
   padding: $spacing-sm 0;
 }
 
-.quotaMessageAction {
-  width: 100%;
-  border: none;
-  background: none;
-  cursor: pointer;
-  text-decoration: underline;
-
-  &:hover:not(:disabled) {
-    color: var(--text-primary);
-  }
-
-  &:disabled {
-    cursor: not-allowed;
-    opacity: 0.6;
-    text-decoration: none;
-  }
-}
-
-.quotaResetCreditButton:global(.btn.btn-sm),
-.quotaRefreshButton:global(.btn.btn-sm) {
+.quotaResetCreditButton:global(.btn.btn-sm) {
   border-radius: 999px;
   padding-inline: 12px;
 
@@ -664,6 +645,10 @@
   gap: $spacing-xs;
   flex-wrap: wrap;
   padding-top: $spacing-xs;
+}
+
+.quotaRefreshIconButton:global(.btn.btn-sm) {
+  color: var(--text-secondary);
 }
 
 .quotaError {
@@ -1114,12 +1099,6 @@
 
   .cardActionsMain {
     gap: 4px;
-  }
-
-  .primaryActionButton:global(.btn.btn-sm) {
-    flex: 0 1 auto;
-    min-width: 0;
-    padding-inline: 8px;
   }
 
   .cardUtilityActions {
@@ -1865,41 +1844,8 @@
   flex: 1;
 }
 
-.primaryActionButton:global(.btn.btn-sm) {
-  min-width: 0;
-  padding-inline: 10px;
-}
-
 .modelsActionButton:global(.btn.btn-sm) {
-  background: color-mix(in srgb, var(--primary-color) 10%, var(--bg-secondary));
-  border-color: color-mix(in srgb, var(--primary-color) 20%, var(--border-color));
-}
-
-.modelsActionButton:global(.btn.btn-sm):hover {
-  border-color: color-mix(in srgb, var(--primary-color) 35%, var(--border-color));
-  background: color-mix(in srgb, var(--primary-color) 14%, var(--bg-secondary));
-}
-
-.modelsActionButton:global(.btn.btn-sm) > span {
-  display: inline-flex;
-  align-items: center;
-  gap: 8px;
-  min-width: 0;
-}
-
-.modelsActionIconWrap {
-  width: 22px;
-  height: 22px;
-  flex: 0 0 auto;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  border-radius: 8px;
-  background: color-mix(in srgb, var(--primary-color) 16%, transparent);
-}
-
-.actionButtonLabel {
-  @include text-ellipsis;
+  color: var(--text-secondary);
 }
 
 .cardUtilityActions {
@@ -1948,11 +1894,6 @@
   .cardActionsMain {
     flex-wrap: wrap;
     width: 100%;
-  }
-
-  .primaryActionButton:global(.btn.btn-sm) {
-    flex: 1 1 auto;
-    min-width: 0;
   }
 
   .statusToggle {
@@ -2184,7 +2125,7 @@
 .viewModeSwitch {
   display: inline-flex;
   align-items: center;
-  gap: $spacing-xs;
+  gap: $spacing-sm;
   flex-wrap: wrap;
   min-width: 0;
   max-width: 100%;

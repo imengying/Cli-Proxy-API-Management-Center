@@ -17,7 +17,7 @@
 .tabBar {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 2px;
+  gap: $spacing-sm;
   width: min(100%, 360px);
   padding: 2px;
   border: 1px solid var(--border);

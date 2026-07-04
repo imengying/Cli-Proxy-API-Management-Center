@@ -7,6 +7,7 @@ import {
   IconDownload,
   IconInfo,
   IconModelCluster,
+  IconRefreshCw,
   IconSettings,
   IconTrash2,
 } from '@/components/ui/icons';
@@ -34,7 +35,8 @@ import {
   type ResolvedTheme,
 } from '@/features/authFiles/constants';
 import type { AuthFileStatusBarData } from '@/features/authFiles/hooks/useAuthFilesStatusBarCache';
-import { AuthFileQuotaSection } from '@/features/authFiles/components/AuthFileQuotaSection';
+import { AuthFileQuotaContent } from '@/features/authFiles/components/AuthFileQuotaContent';
+import { useAuthFileQuotaControls } from '@/features/authFiles/hooks/useAuthFileQuotaControls';
 import styles from '@/pages/AuthFilesPage.module.scss';
 
 const HEALTHY_STATUS_MESSAGES = new Set(['ok', 'healthy', 'ready', 'success', 'available']);
@@ -101,6 +103,11 @@ export function AuthFileCard(props: AuthFileCardProps) {
   const useQuotaManagedStyle = Boolean(quotaFilterType && resolvedQuotaType === quotaFilterType);
 
   const showQuotaLayout = Boolean(resolvedQuotaType) && !isRuntimeOnly && !compact;
+  const quotaControls = useAuthFileQuotaControls({
+    file,
+    quotaType,
+    disableControls,
+  });
 
   const providerCardClass = !useQuotaManagedStyle
     ? ''
@@ -252,11 +259,7 @@ export function AuthFileCard(props: AuthFileCardProps) {
             </div>
 
             {showQuotaLayout && quotaType && (
-              <AuthFileQuotaSection
-                file={file}
-                quotaType={quotaType}
-                disableControls={disableControls}
-              />
+              <AuthFileQuotaContent controls={quotaControls} />
             )}
           </div>
 
@@ -267,18 +270,29 @@ export function AuthFileCard(props: AuthFileCardProps) {
                   variant="secondary"
                   size="sm"
                   onClick={() => onShowModels(file)}
-                  className={`${styles.primaryActionButton} ${styles.modelsActionButton}`}
+                  className={`${styles.iconButton} ${styles.modelsActionButton}`}
                   title={t('auth_files.models_button', { defaultValue: '模型' })}
+                  aria-label={t('auth_files.models_button', { defaultValue: '模型' })}
                   disabled={disableControls}
                 >
-                  <>
-                    <span className={styles.modelsActionIconWrap}>
-                      <IconModelCluster className={styles.actionIcon} size={16} />
-                    </span>
-                    <span className={styles.actionButtonLabel}>
-                      {t('auth_files.models_button', { defaultValue: '模型' })}
-                    </span>
-                  </>
+                  <IconModelCluster className={styles.actionIcon} size={16} />
+                </Button>
+              )}
+              {showQuotaLayout && quotaType && (
+                <Button
+                  variant="secondary"
+                  size="sm"
+                  onClick={() => void quotaControls.refreshQuotaForFile()}
+                  className={`${styles.iconButton} ${styles.quotaRefreshIconButton}`}
+                  title={t('auth_files.quota_refresh_single')}
+                  aria-label={t('auth_files.quota_refresh_single')}
+                  disabled={!quotaControls.canUseRefreshQuota}
+                >
+                  {quotaControls.quotaLoading ? (
+                    <LoadingSpinner size={14} />
+                  ) : (
+                    <IconRefreshCw className={styles.actionIcon} size={16} />
+                  )}
                 </Button>
               )}
               {!isRuntimeOnly && (

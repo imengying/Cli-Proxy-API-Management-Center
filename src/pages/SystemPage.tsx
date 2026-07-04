@@ -139,7 +139,6 @@ export function SystemPage() {
     <div className={styles.container}>
       <div className={styles.content}>
         <Card title={t('system_info.quick_links_title')}>
-          <p className={styles.sectionDescription}>{t('system_info.quick_links_desc')}</p>
           <div className={styles.quickLinks}>
             <a
               href="https://github.com/router-for-me/CLIProxyAPI"
