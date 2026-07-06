@@ -181,6 +181,35 @@ function FieldShell({
   );
 }
 
+function getHeaderHeight() {
+  const header = document.querySelector('.main-header') as HTMLElement | null;
+  if (header) return header.getBoundingClientRect().height;
+
+  const raw = getComputedStyle(document.documentElement).getPropertyValue('--header-height');
+  const parsed = Number.parseFloat(raw);
+  return Number.isFinite(parsed) ? parsed : 64;
+}
+
+function getScrollParents(element: HTMLElement) {
+  const parents: HTMLElement[] = [];
+  let parent = element.parentElement;
+
+  while (parent && parent !== document.body) {
+    const style = getComputedStyle(parent);
+    if (/(auto|scroll|overlay)/.test(style.overflowY)) {
+      parents.push(parent);
+    }
+    parent = parent.parentElement;
+  }
+
+  const contentScroller = document.querySelector('.content') as HTMLElement | null;
+  if (contentScroller && !parents.includes(contentScroller)) {
+    parents.push(contentScroller);
+  }
+
+  return parents;
+}
+
 export function VisualConfigEditor({
   values,
   validationErrors,
@@ -487,31 +516,70 @@ export function VisualConfigEditor({
   const hasValidationIssues = sections.some((section) => section.errorCount > 0);
   const payloadValidationKey = hasPayloadValidationErrors ? 'payload-errors' : 'payload-ok';
 
-  useEffect(() => {
+  useLayoutEffect(() => {
     if (!isCurrentLayer) return undefined;
-    if (typeof IntersectionObserver === 'undefined') return undefined;
+    const workspaceElement = workspaceRef.current;
+    if (!workspaceElement) return undefined;
 
-    const observer = new IntersectionObserver(
-      (entries) => {
-        const visibleEntries = entries
-          .filter((entry) => entry.isIntersecting)
-          .sort((left, right) => right.intersectionRatio - left.intersectionRatio);
+    const scrollParents = getScrollParents(workspaceElement);
+    let frameId = 0;
 
-        if (visibleEntries.length === 0) return;
-        setActiveSectionId(visibleEntries[0].target.id as VisualSectionId);
-      },
-      {
-        rootMargin: '-18% 0px -58% 0px',
-        threshold: [0.12, 0.3, 0.55],
+    const updateActiveSection = () => {
+      frameId = 0;
+      const markerY = getHeaderHeight() + 36;
+      const firstSection = sections[0];
+      let nextActiveId = firstSection?.id;
+
+      for (const section of sections) {
+        const element = sectionRefs.current[section.id];
+        if (!element) continue;
+
+        const rect = element.getBoundingClientRect();
+        if (rect.top <= markerY) {
+          nextActiveId = section.id;
+          continue;
+        }
+
+        if (!nextActiveId && rect.bottom >= markerY) {
+          nextActiveId = section.id;
+        }
+        break;
       }
-    );
 
-    for (const section of sections) {
-      const element = sectionRefs.current[section.id];
-      if (element) observer.observe(element);
+      if (nextActiveId) {
+        setActiveSectionId((current) => (current === nextActiveId ? current : nextActiveId));
+      }
+    };
+
+    const requestActiveUpdate = () => {
+      if (frameId) cancelAnimationFrame(frameId);
+      frameId = requestAnimationFrame(updateActiveSection);
+    };
+
+    requestActiveUpdate();
+    window.addEventListener('resize', requestActiveUpdate);
+    window.addEventListener('scroll', requestActiveUpdate, { passive: true });
+    for (const scrollParent of scrollParents) {
+      scrollParent.addEventListener('scroll', requestActiveUpdate, { passive: true });
     }
 
-    return () => observer.disconnect();
+    const resizeObserver =
+      typeof ResizeObserver === 'undefined' ? null : new ResizeObserver(requestActiveUpdate);
+    resizeObserver?.observe(workspaceElement);
+    for (const section of sections) {
+      const element = sectionRefs.current[section.id];
+      if (element) resizeObserver?.observe(element);
+    }
+
+    return () => {
+      if (frameId) cancelAnimationFrame(frameId);
+      resizeObserver?.disconnect();
+      window.removeEventListener('resize', requestActiveUpdate);
+      window.removeEventListener('scroll', requestActiveUpdate);
+      for (const scrollParent of scrollParents) {
+        scrollParent.removeEventListener('scroll', requestActiveUpdate);
+      }
+    };
   }, [isCurrentLayer, sections]);
 
   useEffect(() => {
@@ -564,35 +632,7 @@ export function VisualConfigEditor({
       return undefined;
     }
 
-    const computeHeaderHeight = () => {
-      const header = document.querySelector('.main-header') as HTMLElement | null;
-      if (header) return header.getBoundingClientRect().height;
-
-      const raw = getComputedStyle(document.documentElement).getPropertyValue('--header-height');
-      const parsed = Number.parseFloat(raw);
-      return Number.isFinite(parsed) ? parsed : 64;
-    };
-
-    let headerHeight = computeHeaderHeight();
-    const getScrollParents = (element: HTMLElement) => {
-      const parents: HTMLElement[] = [];
-      let parent = element.parentElement;
-
-      while (parent && parent !== document.body) {
-        const style = getComputedStyle(parent);
-        if (/(auto|scroll|overlay)/.test(style.overflowY)) {
-          parents.push(parent);
-        }
-        parent = parent.parentElement;
-      }
-
-      const contentScroller = document.querySelector('.content') as HTMLElement | null;
-      if (contentScroller && !parents.includes(contentScroller)) {
-        parents.push(contentScroller);
-      }
-
-      return parents;
-    };
+    let headerHeight = getHeaderHeight();
     const scrollParents = getScrollParents(workspaceElement);
     let cachedFloatingHeight = floatingElement.getBoundingClientRect().height || 200;
     let frameId = 0;
@@ -629,7 +669,7 @@ export function VisualConfigEditor({
     };
 
     const handleResize = () => {
-      headerHeight = computeHeaderHeight();
+      headerHeight = getHeaderHeight();
       cachedFloatingHeight = floatingElement.getBoundingClientRect().height || cachedFloatingHeight;
       requestPositionUpdate();
     };
