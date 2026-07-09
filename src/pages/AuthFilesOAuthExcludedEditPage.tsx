@@ -7,8 +7,7 @@ import { LoadingSpinner } from '@/components/ui/LoadingSpinner';
 import { SelectionCheckbox } from '@/components/ui/SelectionCheckbox';
 import { AutocompleteInput } from '@/components/ui/AutocompleteInput';
 import { EmptyState } from '@/components/ui/EmptyState';
-import { IconInfo } from '@/components/ui/icons';
-import { SecondaryScreenShell } from '@/components/common/SecondaryScreenShell';
+import { IconChevronLeft, IconInfo } from '@/components/ui/icons';
 import { useEdgeSwipeBack } from '@/hooks/useEdgeSwipeBack';
 import { useAuthStore, useNotificationStore } from '@/stores';
 import { authFilesApi } from '@/services/api';
@@ -285,142 +284,166 @@ export function AuthFilesOAuthExcludedEditPage() {
   const canSave = !disableControls && !saving && !excludedUnsupported;
 
   return (
-    <SecondaryScreenShell
-      ref={swipeRef}
-      title={title}
-      onBack={handleBack}
-      backLabel={t('common.back')}
-      backAriaLabel={t('common.back')}
-      contentClassName={styles.pageContent}
-      rightAction={
-        <Button size="sm" onClick={handleSave} loading={saving} disabled={!canSave}>
-          {t('oauth_excluded.save')}
+    <div className={styles.page} ref={swipeRef}>
+      <div className={styles.topBar}>
+        <Button
+          variant="ghost"
+          size="sm"
+          onClick={handleBack}
+          className={styles.backButton}
+          aria-label={t('common.back')}
+        >
+          <IconChevronLeft size={18} />
+          <span>{t('common.back')}</span>
         </Button>
-      }
-      isLoading={initialLoading}
-      loadingLabel={t('common.loading')}
-    >
-      {excludedUnsupported ? (
-        <Card>
-          <EmptyState
-            title={t('oauth_excluded.upgrade_required_title')}
-            description={t('oauth_excluded.upgrade_required_desc')}
-          />
-        </Card>
+        <div className={styles.topBarTitle} title={title}>
+          {title}
+        </div>
+        <div className={styles.rightSlot}>
+          <Button size="sm" onClick={handleSave} loading={saving} disabled={!canSave}>
+            {t('oauth_excluded.save')}
+          </Button>
+        </div>
+      </div>
+
+      {initialLoading ? (
+        <div className={styles.loadingState}>
+          <LoadingSpinner size={16} />
+          <span>{t('common.loading')}</span>
+        </div>
       ) : (
-        <>
-          <Card className={styles.settingsCard}>
-            <div className={styles.settingsHeader}>
-              <div className={styles.settingsHeaderTitle}>
-                <IconInfo size={16} />
-                <span>{t('oauth_excluded.title')}</span>
-              </div>
-              <div className={styles.settingsHeaderHint}>{t('oauth_excluded.description')}</div>
-            </div>
-
-            <div className={styles.settingsSection}>
-              <div className={styles.settingsRow}>
-                <div className={styles.settingsInfo}>
-                  <div className={styles.settingsLabel}>{t('oauth_excluded.provider_label')}</div>
-                  <div className={styles.settingsDesc}>{t('oauth_excluded.provider_hint')}</div>
+        <div className={styles.pageContent}>
+          {excludedUnsupported ? (
+            <Card>
+              <EmptyState
+                title={t('oauth_excluded.upgrade_required_title')}
+                description={t('oauth_excluded.upgrade_required_desc')}
+              />
+            </Card>
+          ) : (
+            <>
+              <Card className={styles.settingsCard}>
+                <div className={styles.settingsHeader}>
+                  <div className={styles.settingsHeaderTitle}>
+                    <IconInfo size={16} />
+                    <span>{t('oauth_excluded.title')}</span>
+                  </div>
+                  <div className={styles.settingsHeaderHint}>{t('oauth_excluded.description')}</div>
                 </div>
-                <div className={styles.settingsControl}>
-                  <AutocompleteInput
-                    id="oauth-excluded-provider"
-                    placeholder={t('oauth_excluded.provider_placeholder')}
-                    value={provider}
-                    onChange={updateProvider}
-                    options={providerOptions}
-                    disabled={disableControls || saving}
-                    wrapperStyle={{ marginBottom: 0 }}
-                  />
-                </div>
-              </div>
 
-              {providerOptions.length > 0 && (
-                <div className={styles.tagList}>
-                  {providerOptions.map((option) => {
-                    const isActive =
-                      normalizeProviderKey(provider) === normalizeProviderKey(option);
-                    return (
-                      <button
-                        key={option}
-                        type="button"
-                        className={`${styles.tag} ${isActive ? styles.tagActive : ''}`}
-                        onClick={() => updateProvider(option)}
+                <div className={styles.settingsSection}>
+                  <div className={styles.settingsRow}>
+                    <div className={styles.settingsInfo}>
+                      <div className={styles.settingsLabel}>
+                        {t('oauth_excluded.provider_label')}
+                      </div>
+                      <div className={styles.settingsDesc}>{t('oauth_excluded.provider_hint')}</div>
+                    </div>
+                    <div className={styles.settingsControl}>
+                      <AutocompleteInput
+                        id="oauth-excluded-provider"
+                        placeholder={t('oauth_excluded.provider_placeholder')}
+                        value={provider}
+                        onChange={updateProvider}
+                        options={providerOptions}
                         disabled={disableControls || saving}
-                      >
-                        {getTypeLabel(t, option)}
-                      </button>
-                    );
-                  })}
-                </div>
-              )}
-            </div>
-          </Card>
+                        wrapperStyle={{ marginBottom: 0 }}
+                      />
+                    </div>
+                  </div>
 
-          <Card className={styles.settingsCard}>
-            <div className={styles.settingsHeader}>
-              <div className={styles.settingsHeaderTitle}>{t('oauth_excluded.models_label')}</div>
-              {resolvedProviderKey && (
-                <div className={styles.modelsHint}>
-                  {modelsLoading ? (
-                    <>
-                      <LoadingSpinner size={14} />
-                      <span>{t('oauth_excluded.models_loading')}</span>
-                    </>
-                  ) : modelsError === 'unsupported' ? (
-                    <span>{t('oauth_excluded.models_unsupported')}</span>
-                  ) : modelsList.length > 0 ? (
-                    <span>{t('oauth_excluded.models_loaded', { count: modelsList.length })}</span>
-                  ) : (
-                    <span>{t('oauth_excluded.no_models_available')}</span>
+                  {providerOptions.length > 0 && (
+                    <div className={styles.tagList}>
+                      {providerOptions.map((option) => {
+                        const isActive =
+                          normalizeProviderKey(provider) === normalizeProviderKey(option);
+                        return (
+                          <button
+                            key={option}
+                            type="button"
+                            className={`${styles.tag} ${isActive ? styles.tagActive : ''}`}
+                            onClick={() => updateProvider(option)}
+                            disabled={disableControls || saving}
+                          >
+                            {getTypeLabel(t, option)}
+                          </button>
+                        );
+                      })}
+                    </div>
                   )}
                 </div>
-              )}
-            </div>
+              </Card>
 
-            {modelsLoading ? (
-              <div className={styles.loadingModels}>
-                <LoadingSpinner size={16} />
-                <span>{t('common.loading')}</span>
-              </div>
-            ) : modelsList.length > 0 ? (
-              <div className={styles.modelList}>
-                {modelsList.map((model) => {
-                  const checked = selectedModels.has(model.id);
-                  return (
-                    <SelectionCheckbox
-                      key={model.id}
-                      checked={checked}
-                      disabled={disableControls || saving}
-                      onChange={(value) => toggleModel(model.id, value)}
-                      className={styles.modelItem}
-                      labelClassName={styles.modelText}
-                      label={
+              <Card className={styles.settingsCard}>
+                <div className={styles.settingsHeader}>
+                  <div className={styles.settingsHeaderTitle}>
+                    {t('oauth_excluded.models_label')}
+                  </div>
+                  {resolvedProviderKey && (
+                    <div className={styles.modelsHint}>
+                      {modelsLoading ? (
                         <>
-                          <span className={styles.modelId}>{model.id}</span>
-                          {model.display_name && model.display_name !== model.id && (
-                            <span className={styles.modelDisplayName}>{model.display_name}</span>
-                          )}
+                          <LoadingSpinner size={14} />
+                          <span>{t('oauth_excluded.models_loading')}</span>
                         </>
-                      }
-                    />
-                  );
-                })}
-              </div>
-            ) : resolvedProviderKey ? (
-              <div className={styles.emptyModels}>
-                {modelsError === 'unsupported'
-                  ? t('oauth_excluded.models_unsupported')
-                  : t('oauth_excluded.no_models_available')}
-              </div>
-            ) : (
-              <div className={styles.emptyModels}>{t('oauth_excluded.provider_required')}</div>
-            )}
-          </Card>
-        </>
+                      ) : modelsError === 'unsupported' ? (
+                        <span>{t('oauth_excluded.models_unsupported')}</span>
+                      ) : modelsList.length > 0 ? (
+                        <span>
+                          {t('oauth_excluded.models_loaded', { count: modelsList.length })}
+                        </span>
+                      ) : (
+                        <span>{t('oauth_excluded.no_models_available')}</span>
+                      )}
+                    </div>
+                  )}
+                </div>
+
+                {modelsLoading ? (
+                  <div className={styles.loadingModels}>
+                    <LoadingSpinner size={16} />
+                    <span>{t('common.loading')}</span>
+                  </div>
+                ) : modelsList.length > 0 ? (
+                  <div className={styles.modelList}>
+                    {modelsList.map((model) => {
+                      const checked = selectedModels.has(model.id);
+                      return (
+                        <SelectionCheckbox
+                          key={model.id}
+                          checked={checked}
+                          disabled={disableControls || saving}
+                          onChange={(value) => toggleModel(model.id, value)}
+                          className={styles.modelItem}
+                          labelClassName={styles.modelText}
+                          label={
+                            <>
+                              <span className={styles.modelId}>{model.id}</span>
+                              {model.display_name && model.display_name !== model.id && (
+                                <span className={styles.modelDisplayName}>
+                                  {model.display_name}
+                                </span>
+                              )}
+                            </>
+                          }
+                        />
+                      );
+                    })}
+                  </div>
+                ) : resolvedProviderKey ? (
+                  <div className={styles.emptyModels}>
+                    {modelsError === 'unsupported'
+                      ? t('oauth_excluded.models_unsupported')
+                      : t('oauth_excluded.no_models_available')}
+                  </div>
+                ) : (
+                  <div className={styles.emptyModels}>{t('oauth_excluded.provider_required')}</div>
+                )}
+              </Card>
+            </>
+          )}
+        </div>
       )}
-    </SecondaryScreenShell>
+    </div>
   );
 }

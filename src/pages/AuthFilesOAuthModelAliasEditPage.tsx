@@ -3,11 +3,11 @@ import { useLocation, useNavigate, useSearchParams } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { Card } from '@/components/ui/Card';
 import { Button } from '@/components/ui/Button';
+import { LoadingSpinner } from '@/components/ui/LoadingSpinner';
 import { AutocompleteInput } from '@/components/ui/AutocompleteInput';
 import { EmptyState } from '@/components/ui/EmptyState';
 import { ToggleSwitch } from '@/components/ui/ToggleSwitch';
-import { IconInfo, IconX } from '@/components/ui/icons';
-import { SecondaryScreenShell } from '@/components/common/SecondaryScreenShell';
+import { IconChevronLeft, IconInfo, IconX } from '@/components/ui/icons';
 import { useEdgeSwipeBack } from '@/hooks/useEdgeSwipeBack';
 import { useAuthStore, useNotificationStore } from '@/stores';
 import { authFilesApi } from '@/services/api';
@@ -345,145 +345,163 @@ export function AuthFilesOAuthModelAliasEditPage() {
   const canSave = !disableControls && !saving && !modelAliasUnsupported;
 
   return (
-    <SecondaryScreenShell
-      ref={swipeRef}
-      title={title}
-      onBack={handleBack}
-      backLabel={t('common.back')}
-      backAriaLabel={t('common.back')}
-      contentClassName={styles.pageContent}
-      rightAction={
-        <Button size="sm" onClick={handleSave} loading={saving} disabled={!canSave}>
-          {t('oauth_model_alias.save')}
+    <div className={styles.page} ref={swipeRef}>
+      <div className={styles.topBar}>
+        <Button
+          variant="ghost"
+          size="sm"
+          onClick={handleBack}
+          className={styles.backButton}
+          aria-label={t('common.back')}
+        >
+          <IconChevronLeft size={18} />
+          <span>{t('common.back')}</span>
         </Button>
-      }
-      isLoading={initialLoading}
-      loadingLabel={t('common.loading')}
-    >
-      {modelAliasUnsupported ? (
-        <Card>
-          <EmptyState
-            title={t('oauth_model_alias.upgrade_required_title')}
-            description={t('oauth_model_alias.upgrade_required_desc')}
-          />
-        </Card>
+        <div className={styles.topBarTitle} title={title}>
+          {title}
+        </div>
+        <div className={styles.rightSlot}>
+          <Button size="sm" onClick={handleSave} loading={saving} disabled={!canSave}>
+            {t('oauth_model_alias.save')}
+          </Button>
+        </div>
+      </div>
+
+      {initialLoading ? (
+        <div className={styles.loadingState}>
+          <LoadingSpinner size={16} />
+          <span>{t('common.loading')}</span>
+        </div>
       ) : (
-        <>
-          <Card className={styles.settingsCard}>
-            <div className={styles.settingsHeader}>
-              <div className={styles.settingsHeaderTitle}>
-                <IconInfo size={16} />
-                <span>{t('oauth_model_alias.title')}</span>
-              </div>
-              <div className={styles.settingsHeaderHint}>{headerHint}</div>
-            </div>
-
-            <div className={styles.settingsSection}>
-              <div className={styles.settingsRow}>
-                <div className={styles.settingsInfo}>
-                  <div className={styles.settingsLabel}>
-                    {t('oauth_model_alias.provider_label')}
+        <div className={styles.pageContent}>
+          {modelAliasUnsupported ? (
+            <Card>
+              <EmptyState
+                title={t('oauth_model_alias.upgrade_required_title')}
+                description={t('oauth_model_alias.upgrade_required_desc')}
+              />
+            </Card>
+          ) : (
+            <>
+              <Card className={styles.settingsCard}>
+                <div className={styles.settingsHeader}>
+                  <div className={styles.settingsHeaderTitle}>
+                    <IconInfo size={16} />
+                    <span>{t('oauth_model_alias.title')}</span>
                   </div>
-                  <div className={styles.settingsDesc}>{t('oauth_model_alias.provider_hint')}</div>
+                  <div className={styles.settingsHeaderHint}>{headerHint}</div>
                 </div>
-                <div className={styles.settingsControl}>
-                  <AutocompleteInput
-                    id="oauth-model-alias-provider"
-                    placeholder={t('oauth_model_alias.provider_placeholder')}
-                    value={provider}
-                    onChange={updateProvider}
-                    options={providerOptions}
-                    disabled={disableControls || saving}
-                    wrapperStyle={{ marginBottom: 0 }}
-                  />
-                </div>
-              </div>
 
-              {providerOptions.length > 0 && (
-                <div className={styles.tagList}>
-                  {providerOptions.map((option) => {
-                    const isActive =
-                      normalizeProviderKey(provider) === normalizeProviderKey(option);
-                    return (
-                      <button
-                        key={option}
-                        type="button"
-                        className={`${styles.tag} ${isActive ? styles.tagActive : ''}`}
-                        onClick={() => updateProvider(option)}
+                <div className={styles.settingsSection}>
+                  <div className={styles.settingsRow}>
+                    <div className={styles.settingsInfo}>
+                      <div className={styles.settingsLabel}>
+                        {t('oauth_model_alias.provider_label')}
+                      </div>
+                      <div className={styles.settingsDesc}>
+                        {t('oauth_model_alias.provider_hint')}
+                      </div>
+                    </div>
+                    <div className={styles.settingsControl}>
+                      <AutocompleteInput
+                        id="oauth-model-alias-provider"
+                        placeholder={t('oauth_model_alias.provider_placeholder')}
+                        value={provider}
+                        onChange={updateProvider}
+                        options={providerOptions}
                         disabled={disableControls || saving}
-                      >
-                        {getTypeLabel(t, option)}
-                      </button>
-                    );
-                  })}
-                </div>
-              )}
-            </div>
-          </Card>
-
-          <Card className={styles.settingsCard}>
-            <div className={styles.mappingsHeader}>
-              <div className={styles.mappingsTitle}>{t('oauth_model_alias.alias_label')}</div>
-              <Button
-                variant="secondary"
-                size="sm"
-                onClick={addMappingEntry}
-                disabled={disableControls || saving || modelAliasUnsupported}
-              >
-                {t('oauth_model_alias.add_alias')}
-              </Button>
-            </div>
-
-            <div className={styles.mappingsBody}>
-              {mappings.map((entry, index) => (
-                <div key={entry.id} className={styles.mappingRow}>
-                  <AutocompleteInput
-                    wrapperStyle={{ flex: 1, marginBottom: 0 }}
-                    placeholder={t('oauth_model_alias.alias_name_placeholder')}
-                    value={entry.name}
-                    onChange={(val) => updateMappingEntry(index, 'name', val)}
-                    disabled={disableControls || saving}
-                    options={modelsList.map((model) => ({
-                      value: model.id,
-                      label:
-                        model.display_name && model.display_name !== model.id
-                          ? model.display_name
-                          : undefined,
-                    }))}
-                  />
-                  <span className={styles.mappingSeparator}>→</span>
-                  <input
-                    className={`input ${styles.mappingAliasInput}`}
-                    placeholder={t('oauth_model_alias.alias_placeholder')}
-                    value={entry.alias}
-                    onChange={(e) => updateMappingEntry(index, 'alias', e.target.value)}
-                    disabled={disableControls || saving}
-                  />
-                  <div className={styles.mappingFork}>
-                    <ToggleSwitch
-                      label={t('oauth_model_alias.alias_fork_label')}
-                      labelPosition="left"
-                      checked={Boolean(entry.fork)}
-                      onChange={(value) => updateMappingEntry(index, 'fork', value)}
-                      disabled={disableControls || saving}
-                    />
+                        wrapperStyle={{ marginBottom: 0 }}
+                      />
+                    </div>
                   </div>
+
+                  {providerOptions.length > 0 && (
+                    <div className={styles.tagList}>
+                      {providerOptions.map((option) => {
+                        const isActive =
+                          normalizeProviderKey(provider) === normalizeProviderKey(option);
+                        return (
+                          <button
+                            key={option}
+                            type="button"
+                            className={`${styles.tag} ${isActive ? styles.tagActive : ''}`}
+                            onClick={() => updateProvider(option)}
+                            disabled={disableControls || saving}
+                          >
+                            {getTypeLabel(t, option)}
+                          </button>
+                        );
+                      })}
+                    </div>
+                  )}
+                </div>
+              </Card>
+
+              <Card className={styles.settingsCard}>
+                <div className={styles.mappingsHeader}>
+                  <div className={styles.mappingsTitle}>{t('oauth_model_alias.alias_label')}</div>
                   <Button
-                    variant="ghost"
+                    variant="secondary"
                     size="sm"
-                    onClick={() => removeMappingEntry(index)}
-                    disabled={disableControls || saving || mappings.length <= 1}
-                    title={t('common.delete')}
-                    aria-label={t('common.delete')}
+                    onClick={addMappingEntry}
+                    disabled={disableControls || saving || modelAliasUnsupported}
                   >
-                    <IconX size={14} />
+                    {t('oauth_model_alias.add_alias')}
                   </Button>
                 </div>
-              ))}
-            </div>
-          </Card>
-        </>
+
+                <div className={styles.mappingsBody}>
+                  {mappings.map((entry, index) => (
+                    <div key={entry.id} className={styles.mappingRow}>
+                      <AutocompleteInput
+                        wrapperStyle={{ flex: 1, marginBottom: 0 }}
+                        placeholder={t('oauth_model_alias.alias_name_placeholder')}
+                        value={entry.name}
+                        onChange={(val) => updateMappingEntry(index, 'name', val)}
+                        disabled={disableControls || saving}
+                        options={modelsList.map((model) => ({
+                          value: model.id,
+                          label:
+                            model.display_name && model.display_name !== model.id
+                              ? model.display_name
+                              : undefined,
+                        }))}
+                      />
+                      <span className={styles.mappingSeparator}>→</span>
+                      <input
+                        className={`input ${styles.mappingAliasInput}`}
+                        placeholder={t('oauth_model_alias.alias_placeholder')}
+                        value={entry.alias}
+                        onChange={(e) => updateMappingEntry(index, 'alias', e.target.value)}
+                        disabled={disableControls || saving}
+                      />
+                      <div className={styles.mappingFork}>
+                        <ToggleSwitch
+                          label={t('oauth_model_alias.alias_fork_label')}
+                          labelPosition="left"
+                          checked={Boolean(entry.fork)}
+                          onChange={(value) => updateMappingEntry(index, 'fork', value)}
+                          disabled={disableControls || saving}
+                        />
+                      </div>
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        onClick={() => removeMappingEntry(index)}
+                        disabled={disableControls || saving || mappings.length <= 1}
+                        title={t('common.delete')}
+                        aria-label={t('common.delete')}
+                      >
+                        <IconX size={14} />
+                      </Button>
+                    </div>
+                  ))}
+                </div>
+              </Card>
+            </>
+          )}
+        </div>
       )}
-    </SecondaryScreenShell>
+    </div>
   );
 }

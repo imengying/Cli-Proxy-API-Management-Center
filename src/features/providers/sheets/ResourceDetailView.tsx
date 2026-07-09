@@ -22,12 +22,11 @@ export function ResourceDetailView({ resource, usageByProvider }: ResourceDetail
 
     return (
       <div>
-        <div className={styles.detailHeader}>
-          <div className={styles.sectionTitle}>{resource.identifier}</div>
-          <p className={styles.sectionDesc}>{t('providersPage.ampcode.detailHint')}</p>
-        </div>
-
         <dl className={styles.dl}>
+          <div>
+            <dt className={styles.dt}>{t('providersPage.detail.fields.identifier')}</dt>
+            <dd className={styles.dd}>{resource.identifier}</dd>
+          </div>
           <div>
             <dt className={styles.dt}>{t('providersPage.ampcode.upstreamUrl')}</dt>
             <dd className={styles.dd}>{raw.upstreamUrl ?? t('providersPage.status.notSet')}</dd>
@@ -57,7 +56,7 @@ export function ResourceDetailView({ resource, usageByProvider }: ResourceDetail
         </dl>
 
         {modelMappings.length > 0 ? (
-          <div style={{ marginTop: 16 }}>
+          <div className={styles.detailSection}>
             <Collapsible label={t('providersPage.ampcode.modelMappingsSection')}>
               <dl className={styles.dl}>
                 {modelMappings.map((mapping) => (
@@ -95,10 +94,6 @@ export function ResourceDetailView({ resource, usageByProvider }: ResourceDetail
 
   return (
     <div>
-      <div className={styles.detailHeader}>
-        <div className={styles.sectionTitle}>{resource.name ?? resource.identifier}</div>
-      </div>
-
       <dl className={styles.dl}>
         {primary.map(([key, value]) => (
           <div key={key}>
@@ -109,39 +104,49 @@ export function ResourceDetailView({ resource, usageByProvider }: ResourceDetail
       </dl>
 
       {openaiConfig && apiKeyEntries.length > 0 ? (
-        <div className={styles.apiKeyEntriesSection}>
-          <div className={styles.apiKeyEntriesLabel}>
-            {t('providersPage.form.apiKeyEntriesSection')}: {apiKeyEntries.length}
-          </div>
-          <div className={styles.apiKeyEntryList}>
-            {apiKeyEntries.map((entry, entryIndex) => {
-              const entryStats = usageByProvider
-                ? getProviderTotalStats(
-                    usageByProvider,
-                    openaiConfig.name,
-                    entry.apiKey,
-                    openaiConfig.baseUrl
-                  )
-                : { success: 0, failure: 0 };
-              return (
-                <div key={`${entry.apiKey}-${entryIndex}`} className={styles.apiKeyEntryCard}>
-                  <span className={styles.apiKeyEntryIndex}>{entryIndex + 1}</span>
-                  <span className={styles.apiKeyEntryKey}>{maskApiKey(entry.apiKey)}</span>
-                  {entry.proxyUrl ? (
-                    <span className={styles.apiKeyEntryProxy}>{entry.proxyUrl}</span>
-                  ) : null}
-                  <div className={styles.apiKeyEntryStats}>
-                    <span className={`${styles.apiKeyEntryStat} ${styles.apiKeyEntryStatSuccess}`}>
-                      <IconCheck size={12} /> {entryStats.success}
-                    </span>
-                    <span className={`${styles.apiKeyEntryStat} ${styles.apiKeyEntryStatFailure}`}>
-                      <IconX size={12} /> {entryStats.failure}
-                    </span>
+        <div className={styles.detailSection}>
+          <Collapsible
+            label={`${t('providersPage.form.apiKeyEntriesSection')}: ${apiKeyEntries.length}`}
+          >
+            <div className={styles.entriesList}>
+              {apiKeyEntries.map((entry, entryIndex) => {
+                const entryStats = usageByProvider
+                  ? getProviderTotalStats(
+                      usageByProvider,
+                      openaiConfig.name,
+                      entry.apiKey,
+                      openaiConfig.baseUrl
+                    )
+                  : { success: 0, failure: 0 };
+                return (
+                  <div key={`${entry.apiKey}-${entryIndex}`} className={styles.entryCard}>
+                    <div className={styles.entryCardHeader}>
+                      <span className={styles.entryBadge}>#{entryIndex + 1}</span>
+                      <span className={styles.entrySummaryKey}>{maskApiKey(entry.apiKey)}</span>
+                      <div className={styles.entryCardHeaderRight}>
+                        <span className={`${styles.entryBadge} ${styles.statusIconSuccess}`}>
+                          <IconCheck size={12} /> {entryStats.success}
+                        </span>
+                        <span className={`${styles.entryBadge} ${styles.statusIconError}`}>
+                          <IconX size={12} /> {entryStats.failure}
+                        </span>
+                      </div>
+                    </div>
+                    {entry.proxyUrl ? (
+                      <div className={styles.entryCardBody}>
+                        <dl className={styles.dl}>
+                          <div>
+                            <dt className={styles.dt}>{t('providersPage.form.proxyUrl')}</dt>
+                            <dd className={styles.dd}>{entry.proxyUrl}</dd>
+                          </div>
+                        </dl>
+                      </div>
+                    ) : null}
                   </div>
-                </div>
-              );
-            })}
-          </div>
+                );
+              })}
+            </div>
+          </Collapsible>
         </div>
       ) : null}
 
