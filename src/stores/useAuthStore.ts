@@ -6,6 +6,7 @@ import { obfuscatedStorage } from '@/services/storage/secureStorage';
 import { apiClient } from '@/services/api/client';
 import { useConfigStore } from './useConfigStore';
 import { useModelsStore } from './useModelsStore';
+import { useQuotaStore } from './useQuotaStore';
 import { detectApiBaseFromLocation, normalizeApiBase } from '@/utils/connection';
 
 interface AuthStoreState extends AuthState {
@@ -88,6 +89,7 @@ export const useAuthStore = create<AuthStoreState>()(
             supportsPlugin: false,
           });
           useModelsStore.getState().clearCache();
+          useQuotaStore.getState().clearQuotaCache();
 
           // 配置 API 客户端
           apiClient.setConfig({
@@ -127,6 +129,7 @@ export const useAuthStore = create<AuthStoreState>()(
         restoreSessionPromise = null;
         useConfigStore.getState().clearCache();
         useModelsStore.getState().clearCache();
+        useQuotaStore.getState().clearQuotaCache();
         set({
           isAuthenticated: false,
           apiBase: '',
@@ -223,9 +226,7 @@ if (typeof window !== 'undefined') {
 
   window.addEventListener('server-version-update', ((e: CustomEvent) => {
     const detail = e.detail || {};
-    useAuthStore
-      .getState()
-      .updateServerVersion(detail.version || null, detail.buildDate || null);
+    useAuthStore.getState().updateServerVersion(detail.version || null, detail.buildDate || null);
   }) as EventListener);
 
   window.addEventListener('server-plugin-support-update', ((e: CustomEvent) => {

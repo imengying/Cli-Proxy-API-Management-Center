@@ -9,6 +9,7 @@ import { EmptyState } from '@/components/ui/EmptyState';
 import { ToggleSwitch } from '@/components/ui/ToggleSwitch';
 import { IconChevronLeft, IconInfo, IconX } from '@/components/ui/icons';
 import { useEdgeSwipeBack } from '@/hooks/useEdgeSwipeBack';
+import { useUnsavedChangesGuard } from '@/hooks/useUnsavedChangesGuard';
 import { useAuthStore, useNotificationStore } from '@/stores';
 import { authFilesApi } from '@/services/api';
 import {
@@ -16,6 +17,10 @@ import {
   getTypeLabel,
   normalizeProviderKey,
 } from '@/features/authFiles/constants';
+import {
+  getModelAliasDraftSignature,
+  isOAuthEditorDirty,
+} from '@/features/authFiles/oauthEditorState';
 import type { AuthFileItem, OAuthModelAliasEntry } from '@/types';
 import { generateId } from '@/utils/helpers';
 import styles from './AuthFilesOAuthModelAliasEditPage.module.scss';
@@ -44,6 +49,7 @@ const normalizeMappingEntries = (
     name: entry.name ?? '',
     alias: entry.alias ?? '',
     fork: Boolean(entry.fork),
+    forceMapping: entry.forceMapping,
   }));
 };
 
@@ -51,12 +57,13 @@ export function AuthFilesOAuthModelAliasEditPage() {
   const { t } = useTranslation();
   const navigate = useNavigate();
   const location = useLocation();
-  const { showNotification } = useNotificationStore();
+  const { showConfirmation, showNotification } = useNotificationStore();
   const connectionStatus = useAuthStore((state) => state.connectionStatus);
   const disableControls = connectionStatus !== 'connected';
 
   const [searchParams, setSearchParams] = useSearchParams();
   const providerFromParams = searchParams.get('provider') ?? '';
+  const [initialProviderKey] = useState(() => normalizeProviderKey(providerFromParams));
 
   const [provider, setProvider] = useState(providerFromParams);
   const [files, setFiles] = useState<AuthFileItem[]>([]);
@@ -105,6 +112,31 @@ export function AuthFilesOAuthModelAliasEditPage() {
     if (!resolvedProviderKey) return false;
     return Object.prototype.hasOwnProperty.call(modelAlias, resolvedProviderKey);
   }, [modelAlias, resolvedProviderKey]);
+  const baselineMappingsSignature = useMemo(
+    () => getModelAliasDraftSignature(modelAlias[resolvedProviderKey] ?? []),
+    [modelAlias, resolvedProviderKey]
+  );
+  const mappingsSignature = useMemo(() => getModelAliasDraftSignature(mappings), [mappings]);
+  const contentDirty = baselineMappingsSignature !== mappingsSignature;
+  const isDirty = isOAuthEditorDirty(
+    initialProviderKey,
+    provider,
+    baselineMappingsSignature,
+    mappingsSignature
+  );
+  const unsavedChangesDialog = useMemo(
+    () => ({
+      title: t('common.unsaved_changes_title'),
+      message: t('common.unsaved_changes_message'),
+      confirmText: t('common.leave'),
+      cancelText: t('common.stay'),
+    }),
+    [t]
+  );
+  const { allowNextNavigation, allowNavigationTo } = useUnsavedChangesGuard({
+    shouldBlock: isDirty,
+    dialog: unsavedChangesDialog,
+  });
   const title = useMemo(() => t('oauth_model_alias.add_title'), [t]);
   const headerHint = useMemo(() => {
     if (!provider.trim()) {
@@ -261,7 +293,7 @@ export function AuthFilesOAuthModelAliasEditPage() {
     };
   }, [modelAliasUnsupported, resolvedProviderKey, showNotification, t]);
 
-  const updateProvider = useCallback(
+  const applyProviderChange = useCallback(
     (value: string) => {
       setProvider(value);
       const next = new URLSearchParams(searchParams);
@@ -271,9 +303,28 @@ export function AuthFilesOAuthModelAliasEditPage() {
       } else {
         next.delete('provider');
       }
+      const nextSearch = next.toString();
+      allowNavigationTo(
+        `${location.pathname}${nextSearch ? `?${nextSearch}` : ''}${location.hash}`
+      );
       setSearchParams(next, { replace: true });
     },
-    [searchParams, setSearchParams]
+    [allowNavigationTo, location.hash, location.pathname, searchParams, setSearchParams]
+  );
+
+  const updateProvider = useCallback(
+    (value: string) => {
+      if (!contentDirty || normalizeProviderKey(value) === resolvedProviderKey) {
+        applyProviderChange(value);
+        return;
+      }
+      showConfirmation({
+        ...unsavedChangesDialog,
+        variant: 'danger',
+        onConfirm: () => applyProviderChange(value),
+      });
+    },
+    [applyProviderChange, contentDirty, resolvedProviderKey, showConfirmation, unsavedChangesDialog]
   );
 
   const updateMappingEntry = useCallback(
@@ -316,7 +367,12 @@ export function AuthFilesOAuthModelAliasEditPage() {
           return null;
         }
         seenAlias.add(aliasKey);
-        return entry.fork ? { name, alias, fork: true } : { name, alias };
+        const normalizedEntry: OAuthModelAliasEntry = { name, alias };
+        if (entry.fork) normalizedEntry.fork = true;
+        if (typeof entry.forceMapping === 'boolean') {
+          normalizedEntry.forceMapping = entry.forceMapping;
+        }
+        return normalizedEntry;
       })
       .filter(Boolean) as OAuthModelAliasEntry[];
 
@@ -333,6 +389,7 @@ export function AuthFilesOAuthModelAliasEditPage() {
         await authFilesApi.deleteOauthModelAlias(channel);
       }
       showNotification(t('oauth_model_alias.save_success'), 'success');
+      allowNextNavigation();
       handleBack();
     } catch (err: unknown) {
       const errorMessage = err instanceof Error ? err.message : '';
@@ -340,7 +397,7 @@ export function AuthFilesOAuthModelAliasEditPage() {
     } finally {
       setSaving(false);
     }
-  }, [handleBack, isEditing, mappings, provider, showNotification, t]);
+  }, [allowNextNavigation, handleBack, isEditing, mappings, provider, showNotification, t]);
 
   const canSave = !disableControls && !saving && !modelAliasUnsupported;
 
