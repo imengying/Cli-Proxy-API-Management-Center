@@ -19,7 +19,7 @@ export const supportsPluginVersionSelection = (installType: string): boolean =>
 
 const stripGitSuffix = (value: string) => value.replace(/\.git$/i, '');
 
-export const getGitHubRepositorySlug = (repository: string): string => {
+const getGitHubRepositorySlug = (repository: string): string => {
   const trimmed = repository.trim();
   if (!trimmed) return '';
 

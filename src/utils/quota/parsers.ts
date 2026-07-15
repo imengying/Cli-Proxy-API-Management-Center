@@ -8,9 +8,6 @@ import type {
   KimiUsagePayload,
   XaiBillingPayload,
 } from '@/types';
-import { normalizeAuthIndex } from '@/utils/authIndex';
-
-export { normalizeAuthIndex };
 
 export function normalizeStringValue(value: unknown): string | null {
   if (typeof value === 'string') {
@@ -53,7 +50,7 @@ export function normalizePlanType(value: unknown): string | null {
   return normalized ? normalized.toLowerCase() : null;
 }
 
-export function decodeBase64UrlPayload(value: string): string | null {
+function decodeBase64UrlPayload(value: string): string | null {
   const trimmed = value.trim();
   if (!trimmed) return null;
   try {

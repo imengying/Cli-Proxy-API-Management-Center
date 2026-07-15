@@ -19,13 +19,13 @@ export interface QuotaStatusState {
   errorStatus?: number;
 }
 
-export interface QuotaProgressBarProps {
+interface QuotaProgressBarProps {
   percent: number | null;
   highThreshold: number;
   mediumThreshold: number;
 }
 
-export function QuotaProgressBar({
+function QuotaProgressBar({
   percent,
   highThreshold,
   mediumThreshold,

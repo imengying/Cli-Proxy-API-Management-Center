@@ -5,7 +5,7 @@ const RFC3339_HIGH_PRECISION_REGEX =
  * Some browsers mis-handle RFC3339 timestamps that include sub-millisecond
  * precision. Normalize them to millisecond precision before parsing.
  */
-export function normalizeTimestampForDateParse(value: string): string {
+function normalizeTimestampForDateParse(value: string): string {
   const trimmed = value.trim();
   if (!trimmed) return '';
 

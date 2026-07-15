@@ -5,14 +5,14 @@ import { getErrorMessage } from '@/utils/helpers';
 import type { ModelInfo } from '@/utils/models';
 import type { ApiKeyEntryInput, ProviderBrand } from '../../types';
 
-export const MODEL_DISCOVERY_BRANDS: ReadonlyArray<ProviderBrand> = [
+const MODEL_DISCOVERY_BRANDS: ReadonlyArray<ProviderBrand> = [
   'gemini',
   'codex',
   'claude',
   'openaiCompatibility',
 ];
 
-export const isModelDiscoveryBrand = (brand: ProviderBrand): boolean =>
+const isModelDiscoveryBrand = (brand: ProviderBrand): boolean =>
   MODEL_DISCOVERY_BRANDS.includes(brand);
 
 export interface UseModelDiscoveryArgs {

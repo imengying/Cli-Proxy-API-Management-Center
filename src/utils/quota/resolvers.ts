@@ -22,7 +22,7 @@ const resolveCodexAuthInfo = (value: unknown): Record<string, unknown> | null =>
   return nested ?? payload;
 };
 
-export function extractCodexChatgptAccountId(value: unknown): string | null {
+function extractCodexChatgptAccountId(value: unknown): string | null {
   const payload = parseIdTokenPayload(value);
   if (!payload) return null;
   return normalizeStringValue(payload.chatgpt_account_id ?? payload.chatgptAccountId);

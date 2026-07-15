@@ -34,6 +34,10 @@ describe('OAuth excluded rules', () => {
     expect(getEffectiveOAuthExcludedRules(['gpt-4o'], ' gpt-* ')).toEqual(['gpt-4o', 'gpt-*']);
   });
 
+  test('ignores a blank pending custom rule', () => {
+    expect(getEffectiveOAuthExcludedRules(['gpt-4o'], '   ')).toEqual(['gpt-4o']);
+  });
+
   test('keeps original spelling for a case-insensitive duplicate', () => {
     expect(getEffectiveOAuthExcludedRules(['GPT-4o'], 'gpt-4O')).toEqual(['GPT-4o']);
   });

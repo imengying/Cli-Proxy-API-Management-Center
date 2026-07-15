@@ -454,14 +454,9 @@ export const normalizeConfigResponse = (raw: unknown): Config => {
 };
 
 export {
-  normalizeApiKeyEntry,
   normalizeGeminiKeyConfig,
-  normalizeModelAliases,
   normalizeOpenAIProvider,
   normalizeProviderKeyConfig,
-  normalizeHeaders,
-  normalizeExcludedModels,
-  normalizeAmpcodeConfig,
   normalizeAmpcodeModelMappings,
   normalizeAmpcodeUpstreamApiKeys,
 };

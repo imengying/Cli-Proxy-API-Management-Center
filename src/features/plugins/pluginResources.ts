@@ -21,7 +21,7 @@ export interface PluginResourceEntry {
 export const getPluginTitle = (plugin: PluginListEntry) =>
   plugin.metadata?.name.trim() || plugin.id;
 
-export const buildPluginResourceRoute = (pluginID: string, menuIndex: number) =>
+const buildPluginResourceRoute = (pluginID: string, menuIndex: number) =>
   `/plugin-pages/${encodeURIComponent(pluginID)}/${menuIndex}`;
 
 export const resolvePluginAssetURL = (value: string, apiBase: string) => {
@@ -45,8 +45,8 @@ export const buildRepositoryURL = (repository: string) => {
 // Matching the whole URL (not just the extracted owner) prevents look-alike
 // hosts like "https://github.com.evil.com/router-for-me/..." from being
 // mistaken for the official org.
-export const OFFICIAL_PLUGIN_REPO_PREFIX = 'https://github.com/router-for-me/';
-export const DEFAULT_PLUGIN_STORE_SOURCE_ID = 'official';
+const OFFICIAL_PLUGIN_REPO_PREFIX = 'https://github.com/router-for-me/';
+const DEFAULT_PLUGIN_STORE_SOURCE_ID = 'official';
 const DEFAULT_PLUGIN_STORE_SOURCE_NAME = 'official';
 
 // Normalize an "owner/repo" slug or repository URL to a bare "owner/repo".
@@ -63,7 +63,7 @@ export const getPluginRepositorySlug = (repository: string): string => {
 // under the router-for-me org prefix. Slugs ("router-for-me/repo") and full URLs
 // are both normalized first; anything else (other hosts, look-alike domains,
 // other owners) is untrusted.
-export const isOfficialRepository = (repository: string): boolean =>
+const isOfficialRepository = (repository: string): boolean =>
   buildRepositoryURL(repository).toLowerCase().startsWith(OFFICIAL_PLUGIN_REPO_PREFIX);
 
 // Both the backend-assigned source identity and repository must be official.

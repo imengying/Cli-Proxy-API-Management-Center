@@ -82,7 +82,7 @@ const resolvePlan = (tierId: string | null): AntigravitySubscriptionPlan => {
   return PLAN_BY_TIER_ID.get(tierId) ?? 'unknown';
 };
 
-export const parseAntigravitySubscriptionSummary = (
+const parseAntigravitySubscriptionSummary = (
   payload: unknown
 ): AntigravitySubscriptionSummary | null => {
   const parsed = parseAntigravityPayload(payload);

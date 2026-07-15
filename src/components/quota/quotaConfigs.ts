@@ -113,7 +113,7 @@ const QUOTA_PROGRESS_HIGH_THRESHOLD = 70;
 const QUOTA_PROGRESS_MEDIUM_THRESHOLD = 30;
 const CODEX_RESET_CREDITS_REQUEST_TIMEOUT_MS = 8000;
 
-export interface QuotaStore {
+interface QuotaStore {
   antigravityQuota: Record<string, AntigravityQuotaState>;
   claudeQuota: Record<string, ClaudeQuotaState>;
   codexQuota: Record<string, CodexQuotaState>;
@@ -474,9 +474,7 @@ const buildCodexQuotaWindows = (payload: CodexUsagePayload, t: TFunction): Codex
         `additional-${index + 1}`;
 
       const idPrefix = normalizeWindowId(limitName) || `additional-${index + 1}`;
-      const additionalPrimaryWindow = rateInfo.primary_window ?? rateInfo.primaryWindow ?? null;
-      const additionalSecondaryWindow =
-        rateInfo.secondary_window ?? rateInfo.secondaryWindow ?? null;
+      const additionalWindows = pickClassifiedWindows(rateInfo);
       const additionalLimitReached = rateInfo.limit_reached ?? rateInfo.limitReached;
       const additionalAllowed = rateInfo.allowed;
 
@@ -485,12 +483,12 @@ const buildCodexQuotaWindows = (payload: CodexUsagePayload, t: TFunction): Codex
         t('codex_quota.additional_primary_window', { name: limitName }),
         'codex_quota.additional_primary_window',
         { name: limitName },
-        additionalPrimaryWindow,
+        additionalWindows.fiveHourWindow,
         additionalLimitReached,
         additionalAllowed
       );
       const additionalSecondaryMeta = selectSecondaryWindowMeta(
-        additionalSecondaryWindow,
+        additionalWindows.weeklyWindow,
         { id: 'weekly', labelKey: 'codex_quota.additional_secondary_window' },
         { id: 'monthly', labelKey: 'codex_quota.additional_team_secondary_window' }
       );
@@ -499,7 +497,7 @@ const buildCodexQuotaWindows = (payload: CodexUsagePayload, t: TFunction): Codex
         t(additionalSecondaryMeta.labelKey, { name: limitName }),
         additionalSecondaryMeta.labelKey,
         { name: limitName },
-        additionalSecondaryWindow,
+        additionalWindows.weeklyWindow,
         additionalLimitReached,
         additionalAllowed
       );
@@ -1549,15 +1547,6 @@ const formatXaiPercent = (value: number | null): string => {
   return `${Math.round(value)}%`;
 };
 
-const formatXaiPeriodRange = (start?: string, end?: string): string => {
-  const startLabel = formatQuotaResetTime(start);
-  const endLabel = formatQuotaResetTime(end);
-  if (startLabel !== '-' && endLabel !== '-') return `${startLabel} ~ ${endLabel}`;
-  if (endLabel !== '-') return endLabel;
-  if (startLabel !== '-') return startLabel;
-  return '';
-};
-
 const XAI_SUPERGROK_LIMIT_CENTS = 15_000;
 const XAI_SUPERGROK_HEAVY_LIMIT_CENTS = 150_000;
 
@@ -1607,7 +1596,6 @@ const renderXaiItems = (
       ? Math.max(0, Math.min(100, billing.usagePercent))
       : null;
   const weeklyRemaining = weeklyUsed === null ? null : Math.max(0, Math.min(100, 100 - weeklyUsed));
-  const weeklyPeriodLabel = formatXaiPeriodRange(billing.periodStart, billing.periodEnd);
   const weeklyResetLabel = formatQuotaResetTime(billing.periodEnd);
   const hasWeeklyData =
     billing.periodType === 'weekly' &&
@@ -1650,9 +1638,6 @@ const renderXaiItems = (
                   percent: formatXaiPercent(weeklyUsed),
                 })
               ),
-              weeklyPeriodLabel
-                ? h('span', { className: styleMap.quotaAmount }, weeklyPeriodLabel)
-                : null,
               weeklyResetLabel !== '-'
                 ? h(
                     'span',

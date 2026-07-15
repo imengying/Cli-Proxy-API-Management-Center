@@ -45,7 +45,7 @@ export const PLUGIN_CONFIG_FIELD_IDS = new Set([
 // Compact helper: every label/hint key lives under config_management.visual.
 const L = (key: string) => `config_management.visual.${key}`;
 
-export const CONFIG_FIELD_SEARCH_INDEX: ConfigFieldSearchEntry[] = [
+const CONFIG_FIELD_SEARCH_INDEX: ConfigFieldSearchEntry[] = [
   // ── connectivity ──────────────────────────────────────────────────────────
   {
     fieldId: 'host',

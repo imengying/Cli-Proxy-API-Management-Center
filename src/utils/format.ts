@@ -63,7 +63,7 @@ export function formatUnixTimestamp(value: unknown, locale?: string): string {
   return locale ? date.toLocaleString(locale) : date.toLocaleString();
 }
 
-export function parseDateValue(value: unknown): Date | null {
+function parseDateValue(value: unknown): Date | null {
   if (value === null || value === undefined || value === '') return null;
 
   const date =
